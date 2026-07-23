@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>טעויות ירי</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <img class="navbar" src="assets/elements/logo.png" alt="icon 1">
+  <img class="title" src="assets/elements/hobim.png" alt="icon 1">
+<button id="infoBtn">
+    ⓘ
+</button>
+    <div id="infoPopup" class="infoPopup">
+
+    <div class="infoBox">
+
+          <p>
+לפניך מבחני הו"בים. בחר בנגמש / האמר ובמבחן הרלוונטי עבורך ובצע אותו.        </p>
+                <button id="closeInfo">סגור</button>
+
+
+
+    </div>
+
+</div>
+    <button id="menuBtn" class="menuBtn">
+
+      <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+
+        <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
+
+      </svg>
+
+    </button>
+
+    <div id="overlay"></div>
+
+    <nav id="sideMenu">
+
+      <a href="index.html">דף הבית</a>
+
+      <a href="page1.html">טעויות ירי</a>
+
+      <a href="page2.html">מבחני הו"בים</a>
+
+      <a href="page3.html">בד״חים</a>
+
+      <a href="page4.html">צייר על המרגמה</a>
+
+    </nav>
+   <div class="vehicleContainer">
+
+    <img src="assets/titles/nag.png"
+         class="vehicleBtn"
+         id="nagmashBtn">
+
+    <img src="assets/titles/ha.png"
+         class="vehicleBtn"
+         id="hummerBtn">
+
+</div>
+
+
+<div id="detailsPopup" class="popup">
+
+    <div class="popupBox">
+        <button id="closeDetails" class="closeDetails">
+    ×
+</button>
+    </button>
+        <h2>פרטים אישיים</h2>
+
+
+
+
+        <input
+        type="text"
+        id="fullName"
+        placeholder="שם מלא">
+
+
+        <input
+        type="number"
+        id="battalion"
+        placeholder="מספר גדוד">
+
+
+        <button id="saveDetails">
+            התחלת מבחן
+        </button>
+
+    </div>
+
+</div>
+
+<div id="testsContainer"></div>
+</body>
+<script>
+       window.addEventListener("load", () => {
+    const hasVisited = localStorage.getItem("infoSeen");
+
+    if (!hasVisited) {
+        infoPopup.classList.add("show");
+        localStorage.setItem("infoSeen", "true");
+    }
+});
+  const menuBtn =
+    document.getElementById("menuBtn");
+
+  const sideMenu =
+    document.getElementById("sideMenu");
+
+  const overlay =
+    document.getElementById("overlay");
+
+  menuBtn.addEventListener("click", () => {
+
+    sideMenu.classList.toggle("active");
+
+    overlay.classList.toggle("active");
+
+    menuBtn.classList.toggle("active");
+
+  });
+
+  overlay.addEventListener("click", closeMenu);
+
+  function closeMenu() {
+
+    sideMenu.classList.remove("active");
+
+    overlay.classList.remove("active");
+
+    menuBtn.classList.remove("active");
+  }
+
+  const infoBtn = document.getElementById("infoBtn");
+const infoPopup = document.getElementById("infoPopup");
+const closeInfo = document.getElementById("closeInfo");
+
+infoBtn.onclick = () => infoPopup.classList.add("show");
+
+closeInfo.onclick = () => infoPopup.classList.remove("show");
+
+infoPopup.onclick = e => {
+
+    if (e.target === infoPopup) {
+
+        infoPopup.classList.remove("show");
+    }
+};
+const testsContainer = document.getElementById("testsContainer");
+
+const popup = document.getElementById("detailsPopup");
+
+const saveBtn = document.getElementById("saveDetails");
+const closeDetails = document.getElementById("closeDetails");
+const vehiclesContainer = document.getElementById("vehiclesContainer");
+const nagmashBtn = document.getElementById("nagmashBtn");
+const hummerBtn = document.getElementById("hummerBtn");
+let selectedVehicle = "";
+let selectedTest = "";
+let selectedFile = "";
+
+const tests = {
+    nagmash: [
+        {
+            name: "קשת",
+            file: "test.html"
+        },
+        {
+            name: "פצמר אינרטי",
+            file: "test.html"
+        },
+        {
+            name: "עוקץ פלדה",
+            file: "test.html"
+        },
+        {
+            name: "נגמש",
+            file: "test.html"
+        },
+        {
+            name: "אלפא",
+            file: "test.html"
+        },
+    ],
+
+    hamer: [
+        {
+            name: "האמר",
+            file: "test.html"
+        },
+        {
+            name: "חנית",
+            file: "test.html"
+        },
+        {
+            name: "רגל עץ",
+            file: "test.html"
+        },
+        {
+            name: "פצמר אינרטי",
+            file: "test.html"
+        },
+        {
+            name: "עוקץ פלדה",
+            file: "test.html"
+        },
+    ]
+};
+
+closeDetails.onclick = () => {
+    popup.classList.remove("show");
+};
+function showTests(vehicle){
+
+    selectedVehicle = vehicle;
+
+    testsContainer.innerHTML = "";
+
+    // מקטין את הכפתור שנבחר
+    const selectedBtn =
+        vehicle === "nagmash" ? nagmashBtn : hummerBtn;
+
+    const otherBtn =
+        vehicle === "nagmash" ? hummerBtn : nagmashBtn;
+
+    selectedBtn.classList.add("selectedVehicle");
+    otherBtn.style.display = "none";
+
+    // כפתור חזרה
+    const backBtn = document.createElement("button");
+    backBtn.className = "backVehicleBtn";
+    backBtn.innerText = "←";
+
+    backBtn.onclick = () => {
+
+        testsContainer.innerHTML = "";
+
+        selectedBtn.classList.remove("selectedVehicle");
+        otherBtn.style.display = "flex";
+
+    };
+
+    testsContainer.appendChild(backBtn);
+
+    tests[vehicle].forEach(test=>{
+
+        const btn = document.createElement("button");
+
+        btn.className = "testBtn";
+        btn.textContent = test.name;
+
+        btn.onclick = ()=>{
+
+            selectedTest = test.name;
+            selectedFile = test.file;
+
+            popup.classList.add("show");
+
+        };
+
+        testsContainer.appendChild(btn);
+
+    });
+
+}
+
+document.getElementById("nagmashBtn").onclick = () => {
+    showTests("nagmash");
+};
+
+document.getElementById("hummerBtn").onclick = () => {
+    showTests("hamer");
+};
+
+saveBtn.onclick = () => {
+
+    const fullName = document.getElementById("fullName").value.trim();
+    const battalion = document.getElementById("battalion").value.trim();
+
+    if (!fullName || !battalion) {
+        alert("יש למלא את כל הפרטים");
+        return;
+    }
+
+
+    sessionStorage.setItem("fullName", fullName);
+
+    sessionStorage.setItem("battalion", battalion);
+
+    sessionStorage.setItem("vehicle", selectedVehicle);
+
+    sessionStorage.setItem("test", selectedTest);
+
+
+    sessionStorage.setItem(
+        "testId",
+        selectedTest
+    );
+
+
+    popup.classList.remove("show");
+
+
+    window.location.href = "test.html";
+
+};
+</script>
+
+
+<div class="dots"></div>
+</body>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    overflow-x: hidden;
+    margin: 0;
+    min-height: 100vh;
+    background-image: url("assets/backgrounds/bg1.png");
+    background-size: 100vw 100vh;
+    background-position: center;
+    background-repeat: repeat-y;
+    direction: rtl;
+    font-family: "secular";
+
+  }
+
+  .header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    z-index: 1000;
+  }
+.selectedVehicle{
+
+    position: fixed;
+
+    top: 0%;
+
+    left: 50%;
+
+    transform: translateX(-50%) scale(.8);
+
+    width: 300px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+    z-index: 1000;
+
+    transition: .35s;
+}
+
+.backVehicleBtn{
+
+    position: absolute;
+
+    top:-50%;
+
+    left: 20px;
+
+    padding: 8px 16px;
+
+    border: none;
+    border-radius: 30px;
+
+    background: rgba(231, 253, 254, 0);
+
+    color: rgba(231,253,254,.9);
+
+    font-family: secular;
+    font-size: 1.6rem;
+    font-weight: 600;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,.15);
+
+    cursor: pointer;
+
+    z-index: 1001;
+
+    transition: .2s;
+}
+
+.backVehicleBtn:active{
+    transform: scale(.95);
+}
+
+  .title {
+    top: 20vh;
+    width: min(70vw, 320px);
+  }
+
+  /* ===== WRAPPER ===== */
+  .cardsWrapper {
+    margin-top: -50px;
+    width: 100%;
+  }
+
+  /* ===== TRACK ===== */
+  .cardsTrack {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 10px;
+
+    scrollbar-width: none;
+  }
+
+  .cardsTrack::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    flex: 0 0 70vw;
+    scroll-snap-align: center;
+
+    background: #e7fdfea9;
+    border-radius: 24px;
+    padding: 10px;
+
+    height: 55vh;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+    opacity: 0.5;
+    transform: scale(0.95);
+    transition: 0.3s;
+  }
+
+  .card.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .cardContent {
+    height: 100%;
+    overflow-y: auto;
+    direction: rtl;
+    color: #5d6940;
+    font-size: 1.1rem;
+  }
+
+  /* ===== TITLE INSIDE CARD ===== */
+  h2 {
+    text-align: center;
+    color: #304d2f;
+    font-size: 1.4rem;
+  }
+
+  /* ===== DOTS ===== */
+  .dots {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #bbb;
+  }
+
+  .dot.active {
+    background: #222;
+  }
+
+  /* ===== MENU ===== */
+  .menuBtn {
+    position: fixed;
+    top: 50px;
+    right: 15px;
+    width: 55px;
+    height: 55px;
+    background: none;
+    border: none;
+    z-index: 1100;
+  }
+
+  
+  #sideMenu.active {
+    right: 0;
+  }
+
+
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s;
+    z-index: 1000;
+  }
+
+  #overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+#sideMenu a{
+
+    text-decoration:none;
+
+    color:#5d6940;
+
+    font-size:1.8rem;
+
+    font-weight: 580;
+
+    padding:2vh 2vw;
+
+    border-bottom:1px solid rgba(0,0,0,.08);
+
+    transition:.25s;
+}
+
+  #sideMenu a:hover {
+
+    background: #dce7d0;
+  }
+
+  :root {
+
+    --menuColor: #EFFEFF;
+    --menuOpenColor: #88b84d;
+
+    --menuWidth: 55vw;
+
+  }
+
+  #sideMenu {
+
+    position: fixed;
+
+    top: 0;
+    right: -100%;
+
+    width: var(--menuWidth);
+
+    height: 100vh;
+
+    background: rgba(245, 250, 248, .95);
+
+    backdrop-filter: blur(12px);
+
+    border-radius: 30px 0 0 30px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    padding-top: 12vh;
+
+    transition: .4s ease;
+
+    z-index: 1000;
+  }
+
+  #sideMenu.active {
+
+    right: 0;
+  }
+
+  
+.infoBtn{
+    position:fixed;
+    top:92%;
+    left:15px;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    border:none;
+    background:#516b42;
+    color:white;
+    font-size:1.5rem;
+    z-index:2000;
+}
+
+.infoPopup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:3000;
+}
+
+.infoPopup.show{
+    display:flex;
+}
+
+.infoBox{
+    background:#effeffc5;
+    padding:10px;
+    border-radius:20px;
+    width:60%;
+    max-width:300px;
+    color: #516b42;
+    text-align:center;
+    font-size: 1.2rem;
+    
+}
+
+#closeInfo{
+      background:#effeffc5;
+    padding:2px;
+    border-radius:20px;
+    width:60%;
+    max-width:300px;
+    color: #516b42;
+    border: none;
+    text-align:center;
+     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    font-size: 1.8rem;
+    font-weight: 600;
+    font-family: secular;
+}
+.vehicleContainer{
+position: absolute;
+    display:flex;
+    flex-direction: column;
+    justify-content:center;
+top: 30%;
+    gap:30px;
+   left: 50%;
+    transform: translateX(-50%);
+   
+
+}
+
+.vehicleBtn{
+
+    width:200px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.vehicleBtn:hover{
+
+    transform:scale(1.05);
+
+}
+
+#testsContainer{
+
+    position:absolute;
+    top:55%;
+    left:50%;
+    transform:translateX(-50%);
+
+    width:90%;
+
+    display:grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap:18px;
+
+    justify-items:center;
+
+}
+
+.testBtn{
+
+    width:40vw;
+
+    height:50px;
+cursor: pointer;
+    border:none;
+
+    border-radius:15px;
+
+    background:#5d6940a5;
+
+    color:#EFFEFF;
+
+    font-size:1.5rem;
+
+    font-family:secular;
+    
+
+}
+
+.popup{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:5000;
+
+}
+
+.popup.show{
+
+    display:flex;
+
+}
+
+.popupBox{
+
+    width:320px;
+
+    background:#effeffbd;
+
+    padding:20px;
+
+    border-radius:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+.popupBox input{
+
+    height:45px;
+
+    border-radius:12px;
+
+    border:1px solid #ccc;
+
+
+    padding:10px;
+    font-family: secular;
+    font-size:18px;
+
+}
+
+.popupBox button{
+
+    height:45px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#5d6940;
+
+    color:#effeff74;
+
+    font-size:20px;
+    font-family: secular;
+
+}
+.selectedVehicle{
+
+    width:40vw;
+
+    display:block;
+
+    margin:auto;
+
+}
+/* #testsContainer{
+
+    position:absolute;
+    top:35%;
+    left:50%;
+    transform:translateX(-50%);
+
+    width:100%;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+} */
+
+@keyframes slideUp {
+
+    from{
+        opacity:0;
+        transform:translateY(40px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+.testBtn{
+
+    animation:slideUp .45s ease forwards;
+    opacity:0;
+
+}
+
+.testBtn:nth-child(1){animation-delay:.05s;}
+.testBtn:nth-child(2){animation-delay:.12s;}
+.testBtn:nth-child(3){animation-delay:.19s;}
+.testBtn:nth-child(4){animation-delay:.26s;}
+.testBtn:nth-child(5){animation-delay:.33s;}
+
+.popup.show{
+
+    display:flex;
+
+}
+
+.popupBox{
+
+    transform:scale(.8);
+    opacity:0;
+    transition:.3s;
+
+}
+
+.popup.show .popupBox{
+
+    transform:scale(1);
+    opacity:1;
+
+}
+
+.backBtn{
+
+    position: absolute;
+top: -30%;
+    width:10vw;
+   left:10%;
+    transform:translateX(-50%);
+    height:4vh;
+
+    border:none;
+
+    border-radius:15px;
+
+    background:#effeff;
+
+    color:#516b42;
+
+    font-size:1.1rem;
+
+    font-family:secular;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+}
+
+.popupBox{
+
+    width:320px;
+
+    background:#effeffbd;
+
+    padding:20px;
+
+    border-radius:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+    position:relative; /* חשוב */
+}
+
+
+#closeDetails{
+
+    position:absolute;
+
+    top:10px;
+
+    left:12px;
+
+    width:30px;
+    height:30px;
+
+    border:none;
+    border-radius:60%;
+
+    background:#5d694000;
+
+    color:#5d6940;
+
+    font-size:2rem;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:0;
+
+    /* box-shadow:0 4px 10px rgba(0,0,0,0.2); */
+
+    transition:.2s;
+
+}
+
+
+.closeDetails:active{
+
+    transform:scale(.85);
+
+}
+#saveDetails{
+
+    height:50px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:#5d6940;
+
+    color:#EFFEFF;
+
+    font-size:1.5rem;
+
+    font-family:secular;
+
+    cursor:pointer;
+
+    box-shadow:0 6px 15px rgba(0,0,0,.25);
+
+    transition:.2s;
+
+}
+
+
+#saveDetails:active{
+
+    transform:scale(.95);
+
+    background:#3f512d;
+
+}
+</style>
+</html>
+

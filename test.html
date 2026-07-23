@@ -1,0 +1,4643 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>טעויות ירי</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <img class="navbar" src="assets/elements/logo.png" alt="icon 1">
+  <!-- <img class="title" src="assets/elements/shooting.png" alt="icon 1"> -->
+  <!-- <button id="infoBtn">
+    ⓘ
+</button> -->
+
+    <button id="menuBtn" class="menuBtn">
+
+      <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+
+        <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
+
+      </svg>
+
+    </button>
+
+    <div id="overlay"></div>
+
+    <nav id="sideMenu">
+
+      <a href="index.html">דף הבית</a>
+
+      <a href="page1.html">טעויות ירי</a>
+
+      <a href="page2.html">מבחני הו"בים</a>
+
+      <a href="page3.html">בד״חים</a>
+
+      <a href="page4.html">צייר על המרגמה</a>
+
+    </nav>
+
+    <!-- מד התקדמות -->
+    <div id="progressContainer">
+
+        <div id="progressText">
+            שאלה 1 מתוך 20
+        </div>
+
+        <div id="progressBar">
+
+            <div id="progressFill"></div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+    <!-- אזור המבחן -->
+
+    <main id="testContainer">
+
+
+        <!-- כאן תופיע השאלה -->
+
+        <section id="questionBox">
+
+
+            <h2 id="questionTitle">
+                
+            </h2>
+
+
+            <div id="answersContainer">
+
+                <!-- תשובות יכנסו כאן דינמית -->
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- כפתור המשך -->
+
+        <button id="nextBtn">
+
+            המשך
+
+        </button>
+
+
+
+    </main>
+
+
+
+
+
+
+
+    <!-- פופאפ תוצאות -->
+
+    <div id="resultPopup" class="popup">
+
+
+        <div class="popupBox">
+
+
+           
+
+            <h2>
+                תוצאות מבחן
+            </h2>
+
+
+
+            <div id="studentDetails">
+
+
+                <p>
+                    שם:
+                    <span id="resultName"></span>
+                </p>
+
+
+                <p>
+                    מספר גדוד:
+                    <span id="resultBattalion"></span>
+                </p>
+
+
+                <p>
+                    מבחן:
+                    <span id="resultTest"></span>
+                </p>
+
+
+
+                <h3>
+
+                    הציון שלך:
+
+                    <span id="resultScore"></span>
+
+                </h3>
+
+
+
+            </div>
+
+
+
+
+
+            <!-- מופיע רק מתחת ל90 -->
+
+            <button id="retryBtn">
+
+                ביצוע מבחן חוזר
+
+            </button>
+
+
+
+            <button id="finishBtn">
+
+                סיום
+
+            </button>
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+
+    <!-- אזור גרירה -->
+
+    <template id="dragBoxesTemplate">
+
+
+        <div class="dragQuestion">
+
+
+            <h2></h2>
+
+
+            <div class="warehouse">
+
+
+                <h3>
+                    מחסן
+                </h3>
+
+
+                <div id="dragItems">
+
+                </div>
+
+
+            </div>
+
+
+
+
+
+            <div class="dropAreas">
+
+
+                <div class="dropBox" data-box="1">
+
+
+                    <h3></h3>
+
+
+                </div>
+
+
+
+                <div class="dropBox" data-box="2">
+
+
+                    <h3></h3>
+
+
+                </div>
+
+
+            </div>
+
+
+
+        </div>
+
+
+    </template>
+
+
+
+
+
+
+
+
+    <!-- השלמת משפט בגרירה -->
+
+    <template id="dragSentenceTemplate">
+
+
+        <div class="sentenceQuestion">
+
+
+            <h2></h2>
+
+
+
+            <div class="sentence">
+
+
+            </div>
+
+
+
+
+            <div class="sentenceWarehouse">
+
+
+                <h3>
+                    מחסן היגדים
+                </h3>
+
+
+
+                <div id="sentenceItems">
+
+
+                </div>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+    </template>
+    <script type="module">
+import { initializeApp } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB8S57Iqfi0p_1JgPlz2NT3upakyo-JYUc",
+  authDomain: "margemhot.firebaseapp.com",
+  databaseURL: "https://margemhot-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "margemhot",
+  storageBucket: "margemhot.firebasestorage.app",
+  messagingSenderId: "798968080375",
+  appId: "1:798968080375:web:7e325f48fc16854bdb70f2",
+  measurementId: "G-MXV3ZWYQ2H"
+};
+
+// Initialize Firebase (הסרת ה-analytics שגרם לקריסה)
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// השמה בחלון הגלובלי במידת הצורך
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.getDocs = getDocs;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+</script>
+
+
+</body>
+
+<script>
+
+
+// ===============================
+// תפריט
+// ===============================
+
+const menuBtn = document.getElementById("menuBtn");
+const sideMenu = document.getElementById("sideMenu");
+const overlay = document.getElementById("overlay");
+
+
+menuBtn.onclick = ()=>{
+
+    sideMenu.classList.toggle("active");
+    overlay.classList.toggle("active");
+
+};
+
+
+overlay.onclick = ()=>{
+
+    sideMenu.classList.remove("active");
+    overlay.classList.remove("active");
+
+};
+
+let draggedItem = null;
+
+function startTouch(e){
+
+    e.preventDefault();
+
+    draggedItem = e.currentTarget;
+
+    draggedItem.classList.add("dragging");
+
+    draggedItem.style.zIndex="9999";
+
+}
+
+
+// ===============================
+// מאגר מבחנים
+// ===============================
+
+
+const testsData = {
+
+
+
+
+
+// "האמר":{
+
+// title:"מבחן האמר",
+
+// questions:[
+
+// {
+
+// type:"multipleMulti",
+
+// question:"",
+
+// answers:[
+
+// "א",
+// "ב",
+// "ג",
+// "ד"
+
+// ],
+
+// correct:1
+
+// }
+
+// ]
+
+// },
+
+
+
+
+"אלפא":{
+
+title:" אלפא",
+
+questions:[
+
+{
+
+type:"multiple",
+
+question:"כמה חיילים יכולים לנסוע על האלפא?",
+
+answers:[
+
+"4 חיילים- נהג, מפקד נסיעה ועוד 2 לוחמים",
+"3 חיילים-נהג, מפקד נסיעה, מפקד מחלקה",
+"5 חיילים- נהג, מפקד נסיעה ועוד 3 לוחמים",
+
+],
+
+correct:0
+
+},
+{
+
+type:"multiple",
+
+question:"מותר להדליק אש במרחק 3 מטר מהאלפא?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+],
+
+correct:1
+
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "מהירות הנסיעה באלפא ביום היא",
+        " קמש."
+       
+    ],
+
+    answers:[
+       "25",
+       "80",
+       "10",
+       "40",
+       "35"
+
+ 
+    ],
+
+    correct:[
+        "40"
+    ]
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "מהירות הנסיעה באלפא בשטח בנוי היא",
+        " קמש."
+       
+    ],
+
+    answers:[
+       "35",
+       "10",
+       "40",
+       "25",
+       "60"
+
+ 
+    ],
+
+    correct:[
+        "25"
+    ]
+},
+{
+
+type:"multipleMulti",
+
+question:"מה הם אמצעי המיגון הנדרשים באלפא? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"שכפצ",
+"קסדה",
+"חגורת בטיחות",
+"משקפי מגן",
+"ברכיות"
+
+],
+
+correct:[0,1,2]
+
+},
+{
+
+type:"multipleMulti",
+
+question:"מה הם הוראות התדלוק באלפא? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"ברז 24 סגור",
+"הדלקת אש 100 מטר ומעלה",
+"השארת 3 סנטימטר רווח מפתח המילוי",
+"מטף בקרבת מקום",
+"ברז 24 דלוק",
+"הדלקת אש 30 מטר ומעלה"
+
+],
+
+correct:[0,2,3,5]
+
+},
+{
+
+type:"multiple",
+
+question:"מהו העיקרון הראשון בעת שריפה?",
+
+answers:[
+
+"עקרון הריצה",
+"עקרון הרצינות",
+"עקרון ההכרזה",
+
+],
+
+correct:2
+
+},
+{
+
+type:"multipleMulti",
+
+question:"מתי מבצעים תרגולת התהפכות? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"בעלייה על סמי",
+"בהחלפת איש צוות",
+"לפני כל נסיעה",
+"פעם בשבוע",
+"במעבר בין יום ללילה",
+"פעם בחודש"
+
+],
+
+correct:[0,1,2,4]
+
+},
+{
+
+type:"multiple",
+
+question:"מהו הזמן היחידי שבו מותר לשכב מתחת לאלפא?",
+
+answers:[
+
+"תמיד",
+"בזמן נסיעה",
+"בעת טיפולים בלבד",
+"בסיום נסיעה"
+
+],
+
+correct:2
+
+},
+{
+
+type:"multiple",
+
+question:"האם מותר להכניס נשק טעון לאלפא?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+],
+
+correct:1
+
+},
+]
+
+},
+
+
+
+"קשת":{
+
+title:" קשת",
+
+questions:[
+
+{
+
+type:"multipleMulti",
+
+question:"מה יש לעשות לפני תחילת תנועה? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"לכבות את נצרת ההינע",
+"להכניס קנה לסגר מסע",
+"להעביר את הנצרה למצב S",
+"להשאיר את הקנה מחוץ לסגר מסע"
+
+],
+
+correct:[0,1]
+
+},
+{
+
+type:"multiple",
+
+question:"מה עלי לעשות כל 10 פצצות?",
+
+answers:[
+
+"לכייל קנה",
+"לחזק BAD",
+"לשקשק את נצרת הירי",
+
+],
+
+correct:1
+
+},
+{
+
+type:"multipleMulti",
+
+question:"מה נחשב לטעות ירי? בחר 2 תשובות נכונות",
+
+answers:[
+
+"1000 מטר בירי מצטבר",
+"400 מטר בירי בודד",
+"800 מטר בירי בודד",
+"550 מטר בירי מצטבר"
+
+],
+
+correct:[1,3]
+
+},
+{
+
+type:"multipleMulti",
+
+question:"מה נבדוק לאחר כל ירי? בחר 2 תשובות נכונות",
+
+answers:[
+
+"BAD תקין",
+"קנה מדורגל",
+"קנה חזר",
+"נצרה על F"
+
+],
+
+correct:[2,3]
+
+},
+{
+
+type:"multiple",
+
+question:"צוות הקנה היורה מחויב באטימה כפולה (אטמי אוזניים + גנטקס) ושכפצ. כל שאר האנשים הנמצאים בעמדה מחוייבים בקסדה, אטמים ושכפצ.",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+
+],
+
+correct:0
+
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "לאחר כינון המרגמה על המפעיל",
+        " ."
+       
+    ],
+
+    answers:[
+       "להכריז צלב על ולבצע הקרא מהשורה הראשונה",
+       "להגיד למשק-ראשי",
+       "לצעוק כל הכבוד למשק",
+
+ 
+    ],
+
+    correct:[
+        "להכריז צלב על ולבצע הקרא מהשורה הראשונה"
+    ]
+},
+{
+
+type:"multiple",
+
+question:"במידה והפצצות בצד של הטען נגמרו המפעיל יכול להחליף אותו בטעינה?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+
+],
+
+correct:1
+
+},
+{
+
+type:"multipleMulti",
+
+question:"בעת איור מי נשאר בעמדה? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"הבקר",
+"מפקד העמדה",
+"צוות הקנה",
+"הסמל והמפ"
+
+
+],
+
+correct:[1,2]
+
+},
+{
+
+type:"multiple",
+
+question:"האם חשוב להצמיד את הידיים לגוף בזמן הירי, קרוב לגנטקס?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+
+],
+
+correct:0
+
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "בתרגולת איור, במידה הפצצה נקורה אנו",
+        "  ."
+       
+    ],
+
+    answers:[
+       "ננסה לירות אותה שוב",
+       "להרחיק אותה מהעמדה ונזדכה עליה מול החימוש",
+
+ 
+    ],
+
+    correct:[
+        "להרחיק אותה מהעמדה ונזדכה עליה מול החימוש"
+    ]
+},
+
+]
+
+},
+
+
+
+
+"נגמש":{
+
+title:" נגמש",
+
+questions:[
+
+{
+
+type:"multipleMulti",
+
+question:"מהי הוראת הבטיחות למניעת שריפה בעת תדלוק נגמש? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"סטיקים נצורים",
+"נגמש מונע",
+"נגמש בקרבת מקום",
+"30 מטר מרחק אש",
+"נגמש מדומם",
+"ברז 24 סגור"
+
+],
+
+correct:[2,3,5]
+
+},
+{
+
+type:"multiple",
+
+question:"מהי כמות האנשים הנדרשת בזמן הכוונה אחורית?",
+
+answers:[
+
+"בן אדם אחד מקדימה",
+"שני אנשים- אחד מקדימה שמכווין ואחד מאחורה",
+"שני אנשים מקדימה- אחד מכווין ואחד מוודא שאין עוד רקמים",
+"שלושה אנשים- אחד מקדימה, אחד אחורה ואחד מהצד"
+
+
+],
+
+correct:1
+
+},
+{
+
+type:"multiple",
+
+question:"בהכוונה אחורית, האם מותר לפעמים שרק מישהו 1 יכווין?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+  
+
+
+],
+
+correct:1
+
+},
+{
+
+type:"multiple",
+
+question:"האם מותר להשען/להשכב על הזחלים?",
+
+answers:[
+
+"אסור בשום אופן, זה יכול לגרום לפריסת זחל",
+"ברור, זה נח",
+"כן, ורק באישור",
+
+
+],
+
+correct:0
+
+},
+
+{
+
+type:"multiple",
+
+question:"האם בתוך שטח הבסיס אפשר לנהוג בלי מפקד שיש מכווין קרקעי?",
+
+answers:[
+"נכון",
+"לא נכון",
+
+
+
+],
+
+correct:0
+
+},
+{
+
+type:"multiple",
+
+question:"מה נעשה במידה ומוביל הנגמש לא יזהה את המכשול שיש לפניו?",
+
+answers:[
+
+"הנהג ידומם את הכלי וירד בעצמו מהנגמש, יראה את המכשול ויחזור לנגמש לנהוג בזהירות מסביבו",
+"נהנג יסע מהר יותר",
+"הכל ישאר כרגיל אך הוא יסע לאט יותר",
+"מפקד הנסיעה ירד, יזהה את המכשול ויכווין קרקעית"
+
+
+],
+
+correct:3
+
+},
+{
+
+type:"multiple",
+
+question:"האם מותר להוריד כבש כאשר המנוע מדומם?",
+
+answers:[
+
+"מותר ואך ורק באישור",
+"אסור, כדי שבמידה ויש מקרה חירום הנהג יוכל להרים את הכבש",
+"בוודאי, מותר ואפילו רצוי",
+
+
+],
+
+correct:1
+
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "בכל תנועה בהכוונה קרקעית על הנהג להיות",
+        " ."
+       
+    ],
+
+    answers:[
+       "עם ראש נמוך ומדף פתוח",
+       "עם ראש נמוך ומדף סגור",
+       "עם ראש גבוה ומדף פתוח",
+       "עם ראש גבוה ומדף סגור"
+
+ 
+    ],
+
+    correct:[
+        "עם ראש גבוה ומדף פתוח"
+    ]
+},
+
+]
+
+},
+
+"חנית":{
+
+title:" חנית",
+
+questions:[
+
+{
+
+type:"multipleMulti",
+
+question:"מה נוודא בזמן פריסת המערכת? בחר 2 תשובות נכונות",
+
+answers:[
+
+"שכלל בעלי התפקידים נמצאים עם שכפצ, קסדה ומשקפי מגן",
+"אין חלקי גוף מתחת לבסיס",
+"מתג INS דלוק, סד עצירה קיים",
+"מנגנוני נעילה פתוחים, CF בעמדת העגינה האחורית"
+
+],
+
+correct:[1,3]
+
+},
+{
+
+type:"multipleMulti",
+
+question:"איזה תרגולת יש לבצע לפני נסיעה? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"תרגולת שריפה",
+"תרגולת פנצר",
+"תרגולת תאונה",
+"תרגולת התהפכת",
+"תרגולת ירידה לשול"
+
+],
+
+correct:[0,3,4]
+
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "המפקד ימצא ",
+        " בזמן פתיחת המערכת"
+       
+    ],
+
+    answers:[
+       "בכיסא המפקד",
+       "ליד עמדת העגינה הקדמית",
+       "ליד עמדת העגינה האחורית",
+       "מחוץ לרכב מלפנים"
+
+ 
+    ],
+
+    correct:[
+        "ליד עמדת העגינה האחורית"
+    ]
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "בזמן הירי יונחו (מספר)",
+        "שקי הפקל",
+        "הבסיס (מספר)",
+        "שקי פקל מתחת לבסיס"
+       
+    ],
+
+    answers:[
+       "מעל",
+       "מתחת",
+       "מצד",
+       "1","1","2","2","3","3","4","4","5","5","6","6",
+
+ 
+    ],
+
+    correct:[
+        "3",
+        "3",
+        "מעל"
+    ]
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "בזמן איור בחנית צריכים להתרחק",
+        "מטר מהקנה חוץ ממי שנשאר בעמדה"
+       
+    ],
+
+    answers:[
+       "50",
+       "100",
+       "150",
+       "300",
+       "400",
+       "200"
+
+ 
+    ],
+
+    correct:[
+        "100"
+    ]
+},
+
+{
+
+type:"multipleMulti",
+
+question:"איזה אמצעי מיגון נדרשים בירי חנית? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"גנטקס",
+"אטמים",
+"שכפצ",
+"ברכיות",
+"משקפי מגן"
+
+],
+
+correct:[0,1,2]
+
+},
+
+{
+
+type:"multiple",
+
+question:"מתי ראשי המפקד להרים את מתג הפריסה ולאשר לחייליו להתחיל בפריסת המערכת?",
+
+answers:[
+
+"לאחר שקיבל אישור מהמפקד המשלח",
+"אף תשובה אינה נכונה",
+"לאחר שקיבל אישור ממנהל התרגיל",
+"לאחר שווידא שאין אדם מסביב למערכת למעט 2 החיילים שתפקידם הוא פתיחת המערכת",
+
+],
+
+correct:3
+
+},
+{
+
+type:"multiple",
+
+question:"האם בתפעול איור רק צוות הקנה שבו מתרחש האיור נשארים בעמדה?",
+
+answers:[
+"נכון",
+"לא נכון",
+
+
+],
+
+correct:0
+
+},
+{
+
+type:"multiple",
+
+question:"האם בירי לזווית של 90 מעלות בצידוד נדרש להעביר את הCF של המשק לעמדת העגינה הקדמית?",
+
+answers:[
+"נכון",
+"לא נכון",
+
+
+],
+
+correct:0
+
+},
+{
+
+type:"multiple",
+
+question:"מי הם בעלי התפקידים לביצוע ירי מרגמה?",
+
+answers:[
+"נהג ,פעיל וטען",
+"משק, מפעיל וטען",
+"משק, מפעיל, טען ונהג",
+"משק, נהג"
+
+
+],
+
+correct:1
+
+},
+]
+
+},
+"עוקץ פלדה":{
+
+title:" עוקץ פלדה",
+
+questions:[
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "הפצמר צריך להיות במצב",
+        "בעת טעינתו"
+       
+    ],
+
+    answers:[
+       "מאונך (עומד)",
+       "מאוזן (שכוב)",
+       "לא משנה המצב",
+
+ 
+    ],
+
+    correct:[
+         "מאוזן (שכוב)"
+    ]
+},
+{
+
+type:"multiple",
+
+question:"מה משמעות המטען האדום ומהו הדגש לגביו?",
+
+answers:[
+
+"מטען דמה שחיב להוריד לפני הירי- בגלל זה הוא אדום",
+"המטען שמביא את הפצמר לטווח המינימלי שלו ואסור להוריד אותו",
+
+],
+
+correct:1
+
+},
+{
+
+type:"multiple",
+
+question:"המידה וחלפה שעה מטעינת הפצמר למשימה, האם ניתן לבצע את הירי?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+],
+
+correct:1
+
+},
+{
+
+type:"multiple",
+
+question:"מהו טווח הירי המינימלי לעוקץ פלדה?",
+
+answers:[
+
+"7000",
+"1500",
+"5750",
+"1250",
+"1000"
+
+],
+
+correct:1
+
+},
+{
+
+type:"multipleMulti",
+
+question:"לאחר חליצה של פצמר עוקץ פלדה לאחר איור, מה תרצו לוודא? בחרו את כל התשובות הנכונות",
+
+answers:[
+
+"נצרת ירי על ירי",
+"שסגרנו את המשימה",
+"שרבת לא נשבר/נסדק ושהוא תקין",
+"שהמייצבים וההגאים לא נפתחו"
+
+],
+
+correct:[2,3]
+
+},
+{
+
+type:"multiple",
+
+question:"איזה חוטר יש להעביר לאחר איור?",
+
+answers:[
+
+"יבש רטוב יבש",
+"יבש",
+"כלום רטוב יבש",
+"רטוב יבש רטוב"
+
+],
+
+correct:0
+
+},
+{
+
+type:"multiple",
+
+question:"האם מותר לבצע ירי כאשר הפקד פצמרים טעונים צבע בצבע אדום/אפור/לבן?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+],
+
+correct:1
+
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+       "הזווית שבה איבו וזיק יתמקמו מעל המטרה על מנת ללזור היא",
+        "?"
+       
+    ],
+
+    answers:[
+       "45",
+       "225",
+       "80"
+,       "90",
+"180"
+
+ 
+    ],
+
+    correct:[
+         "90"
+    ]
+},
+{
+
+type:"multiple",
+
+question:"כמה זמן לפני הירי נסיר את השרוול?",
+
+answers:[
+
+"כמה שיותר זמן מראש",
+"לפחות שעה לפני הירי",
+"זמן קצר",
+
+],
+
+correct:2
+
+},
+{
+
+type:"multiple",
+
+question:"כאשר עושים תרגולת לח לפני רטוב מי צריך להיות חלק מהתרגול?",
+
+answers:[
+
+"רק המשק והמעמ",
+"המשק,המעמ,המפעיל והטען",
+"רק הטען והמפעיל",
+
+],
+
+correct:1
+
+},
+
+]
+
+},
+
+
+"פצמר אינרטי":{
+
+title:" פצמר אינרטי",
+
+questions:[
+
+{
+
+type:"multiple",
+
+question:"מתי נבצע ירי עם פצמר אינרטי?",
+
+answers:[
+
+"כאשר אנחנו באימון בביסלח",
+"כאשר אנחנו רוצים לתרגל ברמתנו במוצב שלו",
+"נשתמש בו בכל פצמר רגיל",
+"כאשר אנחננו רוצים לפגוע קרוב ולא לעשות הרבה נזק"
+
+],
+
+correct:0
+
+},
+{
+
+type:"multiple",
+
+question:"האם מותר לנסוע עם פצצות כאשר הן מחומשות?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+
+],
+correct:2
+
+},
+{
+
+type:"multiple",
+
+question:"מתי צריך לחמש את הפצצות ביחידת ההדיפה?",
+
+answers:[
+
+"מראש כדי שלא יהיו בלתמים",
+"אסור לנסוע בכלל עם פצצות מחומשות",
+"מותר בלי בעיה",
+
+],
+
+correct:1
+
+},
+ {
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+        "זוויות ההגבהה של הקנה בעת ירי פצמר אינרטי הם",
+        "-",
+        "."
+    ],
+
+    answers:[
+        "750",
+       "300",
+       "1800",
+       "1300",
+       "800",
+       "600"
+ 
+    ],
+
+    correct:[
+        "800",
+        "1300"
+    ]
+},
+{
+
+type:"multiple",
+
+question:"מתי נחצה קו יורים כדי לאסוף את הפצצות?",
+
+answers:[
+
+"כאשר כל הפצצות יצאו מהקנה",
+"כמה שיותר מהר שלא ישארו בשטח",
+"בצורה מרוכזת רק בסוף הירי ובאישור מפקד העמדה והקצין",
+"לא אוספים אצ הפצצות"
+
+],
+
+correct:2
+
+},
+{
+
+type:"multiple",
+
+question:"מהו הציוד מיגון המחייב בירי של פצמר אינרטי?",
+
+answers:[
+
+"לא צריך ציוד מיגון זה לא ירי של פצצה אמיתית",
+"גנטקס, שכפצ ואטמי אוזניים",
+"גנטקס ואטמי אוזניים",
+"גנטקס,שכפצ ומשקפי מגן"
+
+],
+
+correct:1
+
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+        "יש לשקשק את נצרת הירי בירי של פצמר אינרטי אחרי",
+        "."
+       
+    ],
+
+    answers:[
+       "כל פצצה",
+       "כל 3 פצצות",
+       "כל 10 פצצות",
+
+ 
+    ],
+
+    correct:[
+        "כל פצצה"
+    ]
+},
+{
+
+type:"multiple",
+
+question:"מהי יחידת ההדיפה?",
+
+answers:[
+
+"יחידה עם חומר נפץ שיש להבריג לפני כל ירי לפצמר ולהוציא את המשומשת לאחר סיום הירי",
+"יחידה עם חומר נפץ שקיימת באופן קבוע",
+"יחידה בלי חומר נפץ, המטענים הם מה שמעיפים את הפצמר",
+
+
+],
+
+correct:0
+
+},
+{
+
+type:"multiple",
+
+question:"מה יש לעשות עם המטענים בסוף הירי?",
+
+answers:[
+
+"יש לשרוף אותם שלא יהיה להם שום זכר",
+"יש לאסוף אותם ולהביא לקצין ירי",
+"ניתן לבצע איתם שימוש חוזר",
+
+
+],
+
+correct:1
+
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+        "לפני הירי נעביר את הפצצה",
+        "על מנת לראות שהפצמר יעבור בקנה."
+       
+    ],
+
+    answers:[
+       "בקנה עצמו",
+       "במדיד שמדמה קנה",
+       "בצינור פלסטיק",
+       
+
+ 
+    ],
+
+    correct:[
+        "במדיד שמדמה קנה"
+    ]
+},
+]
+
+},
+
+
+
+"האמר":{
+
+title:" האמר",
+
+questions:[
+    {
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
+
+    sentence:[
+        "מכוונים בלילה בעזרת",
+        ""
+    ],
+
+    answers:[
+        "סטיק לייט",
+       "פנס",
+       "פקל",
+       "אפוד זוהר",
+        "ידיים",
+ 
+    ],
+
+    correct:[
+        "פנס"
+    ]
+},
+
+{
+
+type:"multiple",
+
+question:"כמה חיילים מותר לנסוע בהאמר חנית (כולל נהג)?",
+
+answers:[
+
+"2",
+"3",
+"8",
+"4"
+
+],
+
+correct:3
+
+},
+{
+
+type:"multiple",
+
+question:"מהי מהירות הנסיעה המותרת עם תחמושת?",
+
+answers:[
+
+"30 קמש ביום ו40 קמש בלילה",
+"40 קמש ביום ובלילה",
+"אסור לנסוע בלילה",
+"25 קמש ביום ו20 בלילה"
+
+],
+
+correct:3
+
+},
+{
+
+type:"multiple",
+
+question:"מה נעשה כאשר מפקד הנסיעה מזהה מכשול בדרך?",
+
+answers:[
+
+"יכווין קרקעית את הרכב",
+"ימשיך בנסיעה איטית",
+"יוריד את הנהג להסתכל על המכשול וימשיך על פי החלטת הנהג",
+"ימשיך בנסיעה כרגיל"
+
+],
+
+correct:0
+
+},
+{
+
+type:"multiple",
+
+question:"מהו המרחק של שדה הראייה בזמן חציית כביש?",
+
+answers:[
+
+"100 מ'",
+"120 מ'",
+"250 מ'",
+"100 מ'"
+
+],
+
+correct:1
+
+},
+{
+
+type:"multipleMulti",
+
+question:"מהו ציוד החובה לנסיעה? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"קסדה",
+"שכפצ",
+"אטמים",
+"חגורת בטיחות",
+"משקפי מגן",
+"רצועת בד"
+
+],
+
+correct:[0,3,4,5]
+
+},
+{
+    type:"drag",
+
+    question:"גרור לקובייה המתאימה את מהירות הנסיעה המותרת ללא תחמושת (יש היגדים שאינם נכונים ל2 הקוביות)",
+
+    items:[
+        "40 קמש",
+        "50 קמש",
+        "45 קמש",
+        "65 קמש",
+        "55 קמש"
+    ],
+
+    boxes:[
+        {
+            title:"שטח",
+            correct:[
+                "40 קמש",
+            ]
+        },
+
+        {
+            title:"כביש",
+            correct:[
+               "65 קמש",
+            ]
+        }
+    ]
+
+},
+{
+
+type:"multipleMulti",
+
+question:"מתי חובה לבצע תרגולת התהפכות? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"במעבר בין יום ללילה",
+"בהחלפת איש מצוות הרכב",
+"לפני כל נסיעה",
+"כל שעה",
+"בעת העמסה על סמי",
+"פעם בחודש בלבד"
+
+],
+
+correct:[0,1,2,4]
+
+},
+{
+
+type:"multiple",
+
+question:"התנועה תתבצע אך ורק בצמד?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+
+],
+
+correct:1
+
+},
+{
+
+type:"multipleMulti",
+
+question:"מי יכול ומוסמך לחלץ רכב אחר בדחיפה או משיכה? בחר את כל התשובות הנכונות",
+
+answers:[
+
+"קצין חימוש",
+"מפקד עמדה",
+"קצין אגמי",
+
+],
+
+correct:[0,2]
+
+},
+
+]
+
+},
+
+
+
+"רגל עץ":{
+
+title:" רגל עץ",
+
+questions:[
+
+{
+
+type:"multipleMulti",
+
+question:"אילו תרגולות נצטרך לבצע טרם נסיעה? בחר 2 תשובות נכונות",
+
+answers:[
+
+"תרגולת ירידה לשול",
+"תרגולת התהפכות",
+"תרגולת רדיו",
+"תרגולת תאונה"
+
+],
+
+correct:[0,1]
+
+},
+{
+type:"multiple",
+
+question:"במקרה של עצירה/שהייה מה הכלי הראשון והאחרון בשיירה חייבים לעשות?",
+
+answers:[
+
+"להפעיל רדיו על מנת לא להרדם",
+"להתמקם בצורה אנכית לכלי שלידם",
+"לזרז את שאר הכח על מנת להמשיך נסיעה",
+"להשאיר אורות חנייה"
+
+],
+
+correct:3
+
+},
+{
+type:"multiple",
+
+question:"כמה מכוונים אנו צריכים בהכוונה אחורית?",
+
+answers:[
+
+"אחד מספיק",
+"שניים- אחד מקדימה ואחד מאחור",
+"שלושה- אחד עם הרכב ושניים מלפנים",
+"אין להכווין רגל עץ בהכוונה אחורית!"
+
+],
+
+correct:1
+
+},
+{
+type:"multiple",
+
+question:"מה המהירות המותרת בנסיעה בשטח?",
+
+answers:[
+
+"100 קמש ביום ו70 קמש בלילה",
+"40 קמש ביום ובלילה",
+"55 קמש ביום ובלילה",
+"77 קמש ביום ו50 קמש בלילה"
+
+],
+
+correct:1
+
+},
+{
+    type:"sentenceDrag",
+
+    question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים (קיימות כמה תשובות נכונות)",
+
+    sentence:[
+        "נבצע תרגולת התהפכות ב",
+        ""
+    ],
+
+    answers:[
+        "העמסה על מוביל",
+       "במעבר בין יום ללילה",
+        "לפני כל תחילת נסיעה",
+        "בשינוי אנשי צוות",
+        "כל שעה",
+        "פעם בשבוע"
+    ],
+
+    correct:[
+        "העמסה על מוביל",
+       "במעבר בין יום ללילה",
+        "לפני כל תחילת נסיעה",
+        "בשינוי אנשי צוות",
+    ]
+},
+{
+type:"multiple",
+
+question:"מי משתתף בתרגולת ירידה שול?",
+
+answers:[
+
+"כל צוות הרכב והקצין",
+"כל צוות הרכב",
+"מפקד המשימה ונהג בלבד",
+"הנהג בלבד"
+
+],
+
+correct:2
+
+},
+{
+type:"multiple",
+
+question:"בנסיעה חובה קשר חוץ?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+
+],
+
+correct:0
+
+},
+{
+type:"multiple",
+
+question:"האם מותר באישור קצין שכלההרכבים יחצו את הכביש יחד?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+
+],
+
+correct:1
+
+},
+{
+type:"multiple",
+
+question:"תמיד נוכל להסיע 4 נוסעים ברכב?",
+
+answers:[
+
+"נכון",
+"לא נכון",
+
+
+],
+
+correct:1
+
+},
+{
+
+type:"multipleMulti",
+
+question:"עם איזה ציוד מיגון על כלל הנוסעים ברכב להיות? בחר 3 תשובות נכונות",
+
+answers:[
+
+"קסדה",
+"ברכיות",
+"וסט",
+"משקפי מגן",
+"חגורת בטיחות"
+
+],
+
+correct:[0,3,4]
+
+},
+
+]
+
+},
+
+};
+
+
+
+
+// ===============================
+// משתמש
+// ===============================
+
+
+const userName =
+sessionStorage.getItem("fullName") || "לא נמצא";
+
+
+const battalion =
+sessionStorage.getItem("battalion") || "לא נמצא";
+
+
+const testName =
+sessionStorage.getItem("test");
+
+
+
+console.log("TEST:",testName);
+
+
+
+
+let currentTest = testsData[testName];
+
+
+
+if(!currentTest){
+
+alert(
+"לא נמצא מבחן בשם: "+testName
+);
+
+throw new Error(
+"Missing test data"
+);
+
+}
+
+
+
+// ===============================
+// משתנים
+// ===============================
+
+
+let currentQuestion=0;
+
+let score=0;
+
+let selectedAnswers=[];
+
+
+
+const questionTitle =
+document.getElementById("questionTitle");
+
+
+const answersContainer =
+document.getElementById("answersContainer");
+
+
+const progressText =
+document.getElementById("progressText");
+
+
+const progressFill =
+document.getElementById("progressFill");
+
+
+const nextBtn =
+document.getElementById("nextBtn");
+
+
+
+
+
+// ===============================
+// טעינת שאלה
+// ===============================
+
+
+function loadQuestion(){
+
+
+selectedAnswers=[];
+
+
+const q =
+currentTest.questions[currentQuestion];
+
+
+
+questionTitle.innerHTML =
+q.question;
+
+
+
+answersContainer.innerHTML="";
+
+
+
+progressText.innerHTML=
+`שאלה ${currentQuestion+1} מתוך ${currentTest.questions.length}`;
+
+
+
+progressFill.style.width =
+(
+(currentQuestion /
+currentTest.questions.length)*100
+)+"%";
+
+
+
+nextBtn.style.display="none";
+
+
+
+
+// אמריקאי
+
+if(q.type==="multiple"){
+
+
+q.answers.forEach((answer,index)=>{
+
+
+createAnswerButton(
+answer,
+()=>{
+
+
+if(index===q.correct){
+
+score+=10;
+
+}
+
+
+nextQuestion();
+
+
+}
+
+);
+
+
+});
+
+
+}
+
+
+
+
+
+// נכון לא נכון
+
+if(q.type==="trueFalse"){
+
+
+createAnswerButton(
+"נכון",
+()=>{
+
+if(q.correct===true)
+score+=10;
+
+
+nextQuestion();
+
+});
+
+
+createAnswerButton(
+"לא נכון",
+()=>{
+
+if(q.correct===false)
+score+=10;
+
+
+nextQuestion();
+
+});
+
+
+}
+
+
+if(q.type==="drag"){
+
+
+    createDragQuestion(q);
+
+
+}
+
+if(q.type==="sentenceDrag"){
+
+    createSentenceDrag(q);
+
+}
+
+// בחירה מרובה
+
+
+if(q.type==="multipleMulti"){
+
+
+q.answers.forEach((answer,index)=>{
+
+
+let btn =
+document.createElement("button");
+
+
+btn.className="answerBtn";
+
+btn.innerHTML=answer;
+
+
+btn.onclick=()=>{
+
+
+btn.classList.toggle("selected");
+
+
+if(selectedAnswers.includes(index)){
+
+
+selectedAnswers.splice(
+selectedAnswers.indexOf(index),1
+);
+
+
+}
+
+else{
+
+selectedAnswers.push(index);
+
+}
+
+
+};
+
+
+answersContainer.appendChild(btn);
+
+
+
+});
+
+
+
+nextBtn.style.display="block";
+
+
+nextBtn.onclick=()=>{
+
+
+let a=[...selectedAnswers].sort();
+
+let b=[...q.correct].sort();
+
+
+
+if(JSON.stringify(a)===JSON.stringify(b))
+score+=10;
+
+
+
+nextQuestion();
+
+
+};
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+// ===============================
+// כפתורי תשובות
+// ===============================
+
+
+function createAnswerButton(text,func){
+
+
+let btn=document.createElement("button");
+
+
+btn.className="answerBtn";
+
+btn.innerHTML=text;
+
+
+btn.onclick=func;
+
+
+answersContainer.appendChild(btn);
+
+
+}
+
+function createDragQuestion(q){
+
+    answersContainer.innerHTML="";
+
+
+    let activeDrag = null;
+    let ghost = null;
+
+
+
+
+
+    const boxes=document.createElement("div");
+    boxes.className="dropAreas";
+
+
+
+    const warehouse=document.createElement("div");
+    warehouse.className="warehouse";
+
+
+
+
+
+
+
+    q.boxes.forEach(boxData=>{
+
+
+        let box=document.createElement("div");
+
+
+        box.className="dropBox";
+
+
+        box.innerHTML=
+        `<h3>${boxData.title}</h3>`;
+
+
+        box.dataset.correct =
+        JSON.stringify(boxData.correct);
+
+
+
+
+
+        box.addEventListener(
+            "pointerup",
+            dropToBox
+        );
+
+
+
+        boxes.appendChild(box);
+
+
+
+    });
+
+
+
+
+
+    answersContainer.appendChild(boxes);
+
+
+
+
+
+
+
+    q.items.forEach(item=>{
+
+
+        createDragItem(
+            item,
+            warehouse
+        );
+
+
+    });
+
+
+
+    answersContainer.appendChild(warehouse);
+
+
+
+
+
+
+
+
+
+
+    function createDragItem(value,parent){
+
+
+        let item=document.createElement("div");
+
+
+        item.className="dragItem";
+
+
+        item.innerHTML=value;
+
+
+        item.dataset.value=value;
+
+
+
+        item.addEventListener(
+            "pointerdown",
+            startDrag
+        );
+
+
+
+        parent.appendChild(item);
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function startDrag(e){
+
+
+        e.preventDefault();
+
+
+        activeDrag=this;
+
+
+
+        ghost=this.cloneNode(true);
+
+
+        ghost.className=
+        "dragGhost";
+
+
+
+        document.body.appendChild(
+            ghost
+        );
+
+
+
+        this.classList.add(
+            "dragging"
+        );
+
+
+
+        moveGhost(e);
+
+
+
+        document.addEventListener(
+            "pointermove",
+            moveDrag
+        );
+
+
+
+        document.addEventListener(
+            "pointerup",
+            endDrag
+        );
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function moveDrag(e){
+
+
+        if(!ghost)
+            return;
+
+
+        moveGhost(e);
+
+
+    }
+
+
+
+
+
+
+
+    function moveGhost(e){
+
+
+        ghost.style.left =
+        e.clientX -
+        ghost.offsetWidth/2
+        +"px";
+
+
+
+        ghost.style.top =
+        e.clientY -
+        ghost.offsetHeight/2
+        +"px";
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function endDrag(e){
+
+
+
+        let target =
+        document.elementFromPoint(
+            e.clientX,
+            e.clientY
+        );
+
+
+
+        let box =
+        target?.closest(
+            ".dropBox"
+        );
+
+
+
+        if(box){
+
+
+            addToBox(
+                box,
+                activeDrag.dataset.value
+            );
+
+
+            removeItem(
+                activeDrag
+            );
+
+
+        }
+
+
+
+
+
+        finishDrag();
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function dropToBox(e){
+
+
+        if(!activeDrag)
+            return;
+
+
+        addToBox(
+            this,
+            activeDrag.dataset.value
+        );
+
+
+        removeItem(
+            activeDrag
+        );
+
+
+        finishDrag();
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+    function addToBox(box,value){
+
+
+
+        let existing =
+        [...box.querySelectorAll(
+            ".placedItem"
+        )]
+        .find(
+            x=>x.dataset.value===value
+        );
+
+
+
+        if(existing)
+            return;
+
+
+
+
+
+
+        let item=document.createElement("div");
+
+
+        item.className="placedItem";
+
+
+        item.innerHTML=value;
+
+
+        item.dataset.value=value;
+
+
+
+
+
+        item.addEventListener(
+            "pointerdown",
+            startDrag
+        );
+
+
+
+        box.appendChild(item);
+
+
+
+
+        item.animate(
+            [
+                {
+                    transform:"scale(.7)",
+                    opacity:0
+                },
+                {
+                    transform:"scale(1)",
+                    opacity:1
+                }
+            ],
+            {
+                duration:200
+            }
+        );
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+    function removeItem(item){
+
+
+        if(item){
+
+            item.remove();
+
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function finishDrag(){
+
+
+
+        if(activeDrag){
+
+            activeDrag.classList.remove(
+                "dragging"
+            );
+
+        }
+
+
+
+        if(ghost){
+
+            ghost.remove();
+
+            ghost=null;
+
+        }
+
+
+
+        document.removeEventListener(
+            "pointermove",
+            moveDrag
+        );
+
+
+        document.removeEventListener(
+            "pointerup",
+            endDrag
+        );
+
+
+
+        activeDrag=null;
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+    nextBtn.style.display="block";
+
+
+
+    nextBtn.onclick=()=>{
+
+
+        let totalCorrect=0;
+
+        let totalAnswers=0;
+
+
+
+
+
+        document.querySelectorAll(
+            ".dropBox"
+        )
+        .forEach(box=>{
+
+
+            let correct=
+            JSON.parse(
+                box.dataset.correct
+            );
+
+
+
+            let placed=
+            [
+                ...box.querySelectorAll(
+                    ".placedItem"
+                )
+            ]
+            .map(
+                x=>x.dataset.value
+            );
+
+
+
+            totalAnswers +=
+            correct.length;
+
+
+
+            correct.forEach(item=>{
+
+
+                if(
+                    placed.includes(item)
+                ){
+
+                    totalCorrect++;
+
+                }
+
+
+            });
+
+
+        });
+
+
+
+
+
+        score += Math.round(
+            (
+                totalCorrect /
+                totalAnswers
+            ) * 10
+        );
+
+
+
+        nextQuestion();
+
+
+    };
+
+}
+function createSentenceDrag(q){
+
+    answersContainer.innerHTML="";
+
+
+    let activeDrag=null;
+    let ghost=null;
+
+
+
+
+
+
+    let sentenceBox=document.createElement("div");
+
+    sentenceBox.className="sentence";
+
+
+
+
+    let warehouse=document.createElement("div");
+
+    warehouse.className="warehouse";
+
+
+
+
+
+
+
+    q.sentence.forEach((text,index)=>{
+
+
+        let span=document.createElement("span");
+
+
+        span.innerHTML=text+" ";
+
+
+        sentenceBox.appendChild(span);
+
+
+
+        if(index < q.sentence.length-1){
+
+
+            createDropPlace(index);
+
+
+        }
+
+
+    });
+
+
+
+
+
+    answersContainer.appendChild(sentenceBox);
+
+
+
+
+
+
+
+    function createDropPlace(index){
+
+
+
+        let place=document.createElement("span");
+
+
+        place.className="dropPlace";
+
+
+        place.dataset.index=index;
+
+
+
+        place.addEventListener(
+            "pointerup",
+            dropToPlace
+        );
+
+
+
+        sentenceBox.appendChild(place);
+
+
+    }
+
+
+
+
+
+
+
+
+    q.answers.forEach(word=>{
+
+
+        createWord(
+            word,
+            warehouse
+        );
+
+
+    });
+
+
+
+    answersContainer.appendChild(warehouse);
+
+
+
+
+
+
+
+
+
+    function createWord(value,parent){
+
+
+
+        let item=document.createElement("div");
+
+
+        item.className=
+        "dragItem sentenceItem";
+
+
+        item.innerHTML=value;
+
+
+        item.dataset.value=value;
+
+
+
+        item.addEventListener(
+            "pointerdown",
+            startDrag
+        );
+
+
+
+        parent.appendChild(item);
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function startDrag(e){
+
+
+        e.preventDefault();
+
+
+
+        activeDrag=this;
+
+
+
+        activeDrag.oldParent =
+        this.parentElement;
+
+
+
+        activeDrag.oldIndex =
+        [...this.parentElement.children]
+        .indexOf(this);
+
+
+
+
+        ghost=this.cloneNode(true);
+
+
+        ghost.className=
+        "dragGhost";
+
+
+
+        document.body.appendChild(
+            ghost
+        );
+
+
+
+        this.classList.add(
+            "dragging"
+        );
+
+
+
+        moveGhost(e);
+
+
+
+        document.addEventListener(
+            "pointermove",
+            moveDrag
+        );
+
+
+
+        document.addEventListener(
+            "pointerup",
+            endDrag
+        );
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function moveDrag(e){
+
+
+        if(!ghost)
+            return;
+
+
+        moveGhost(e);
+
+
+    }
+
+
+
+
+
+
+
+
+    function moveGhost(e){
+
+
+
+        ghost.style.left =
+        e.clientX -
+        ghost.offsetWidth/2
+        +"px";
+
+
+
+        ghost.style.top =
+        e.clientY -
+        ghost.offsetHeight/2
+        +"px";
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+    function endDrag(e){
+
+
+
+        let target=
+        document.elementFromPoint(
+            e.clientX,
+            e.clientY
+        );
+
+
+
+        let place=
+        target?.closest(
+            ".dropPlace"
+        );
+
+
+
+        if(place){
+
+
+            dropToPlace.call(
+                place
+            );
+
+
+        }
+        else{
+
+
+            returnBack();
+
+        }
+
+
+
+
+        finishDrag();
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function dropToPlace(){
+
+
+        let place=this;
+
+
+
+        let value=
+        activeDrag.dataset.value;
+
+
+
+        let existing=
+        place.dataset.value;
+
+
+
+
+
+        // אם יש מילה במקום - החלפה
+
+        if(existing){
+
+
+
+            activeDrag.dataset.value =
+            existing;
+
+
+
+            activeDrag.innerHTML =
+            existing;
+
+
+
+            place.innerHTML =
+            value;
+
+
+
+            place.dataset.value =
+            value;
+
+
+
+            return;
+
+
+        }
+
+
+
+
+
+
+
+        // אם מגיע ממקום אחר במשפט
+
+        if(
+            activeDrag.parentElement.classList.contains(
+                "sentence"
+            )
+        ){
+
+
+            let oldPlace =
+            activeDrag.parentElement;
+
+
+
+            oldPlace.innerHTML="";
+
+
+            oldPlace.dataset.value="";
+
+
+        }
+
+
+
+
+
+
+
+        place.innerHTML=value;
+
+
+        place.dataset.value=value;
+
+
+
+        activeDrag.remove();
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function returnBack(){
+
+
+        activeDrag.classList.remove(
+            "dragging"
+        );
+
+
+        if(
+            activeDrag.oldParent
+        ){
+
+
+            activeDrag.oldParent.appendChild(
+                activeDrag
+            );
+
+
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+    function finishDrag(){
+
+
+        if(activeDrag){
+
+            activeDrag.classList.remove(
+                "dragging"
+            );
+
+        }
+
+
+
+        if(ghost){
+
+            ghost.remove();
+
+            ghost=null;
+
+        }
+
+
+
+        document.removeEventListener(
+            "pointermove",
+            moveDrag
+        );
+
+
+
+        document.removeEventListener(
+            "pointerup",
+            endDrag
+        );
+
+
+
+        activeDrag=null;
+
+
+    }
+
+
+
+
+
+
+
+
+
+    nextBtn.style.display="block";
+
+
+
+    nextBtn.onclick=()=>{
+
+
+
+        let answers=[];
+
+
+
+        document.querySelectorAll(
+            ".dropPlace"
+        )
+        .forEach(place=>{
+
+
+            answers.push(
+                place.dataset.value || ""
+            );
+
+
+        });
+
+
+
+
+
+        let correct=0;
+
+
+
+        q.correct.forEach(
+            (item,index)=>{
+
+
+                if(
+                    answers[index]===item
+                ){
+
+                    correct++;
+
+                }
+
+
+            }
+        );
+
+
+
+
+
+        score += Math.round(
+            (
+                correct /
+                q.correct.length
+            ) * 10
+        );
+
+
+
+        nextQuestion();
+
+
+    };
+
+
+}
+// ===============================
+// הבא
+// ===============================
+
+
+function nextQuestion(){
+
+
+currentQuestion++;
+
+
+if(currentQuestion>=currentTest.questions.length){
+
+finishTest();
+
+}
+
+else{
+
+loadQuestion();
+
+}
+
+
+}
+
+
+
+
+
+
+// ===============================
+// סיום
+// ===============================
+async function finishTest(){
+
+
+progressFill.style.width="100%";
+
+
+document
+.getElementById("resultPopup")
+.classList.add("show");
+
+
+
+document.getElementById("resultName").innerHTML=userName;
+
+document.getElementById("resultBattalion").innerHTML=battalion;
+
+document.getElementById("resultTest").innerHTML=currentTest.title;
+
+document.getElementById("resultScore").innerHTML=
+score+" / 100";
+
+
+
+// שמירה ב-Firebase
+
+try {
+
+
+await addDoc(
+collection(db,"testsResults"),
+{
+
+fullName: userName,
+
+battalion: battalion,
+
+testName: currentTest.title,
+
+score: score,
+
+date: new Date().toLocaleString("he-IL")
+
+}
+
+);
+
+
+console.log("נשמר בהצלחה");
+
+
+}
+
+catch(error){
+
+
+console.error(
+"שגיאה בשמירה:",
+error
+);
+
+
+}
+
+
+}
+
+
+document.getElementById("retryBtn").onclick=()=>{
+
+
+currentQuestion=0;
+
+score=0;
+
+
+document
+.getElementById("resultPopup")
+.classList.remove("show");
+
+function saveTestResult(){
+
+    let results = 
+    JSON.parse(localStorage.getItem("testsResults")) || [];
+
+
+    let result = {
+
+        id: Date.now(),
+
+        name:userName,
+
+        battalion:battalion,
+
+        test:currentTest.title,
+
+        score:score,
+
+        date:new Date().toLocaleDateString("he-IL")
+
+    };
+
+
+    results.push(result);
+
+
+    localStorage.setItem(
+        "testsResults",
+        JSON.stringify(results)
+    );
+
+
+}
+loadQuestion();
+
+
+};
+
+
+
+document.getElementById("finishBtn").onclick=()=>{
+
+window.location.href="page2.html";
+
+};
+
+
+
+
+// התחלה
+
+loadQuestion();
+
+async function finishTest() {
+        progressFill.style.width = "100%";
+        document.getElementById("resultPopup").classList.add("show");
+        document.getElementById("resultName").innerHTML = userName;
+        document.getElementById("resultBattalion").innerHTML = battalion;
+        document.getElementById("resultTest").innerHTML = currentTest.title;
+        document.getElementById("resultScore").innerHTML = score + " / 100";
+    }
+
+    document.getElementById("retryBtn").onclick = () => {
+        currentQuestion = 0;
+        score = 0;
+        document.getElementById("resultPopup").classList.remove("show");
+        loadQuestion();
+    };
+
+    document.getElementById("finishBtn").onclick = () => {
+        window.location.href = "page2.html";
+    };
+
+    loadQuestion();
+
+
+</script>
+
+<div class="dots"></div>
+</body>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+
+    margin:0;
+
+    overflow-x:hidden;
+
+    min-height:100vh;
+
+    width:100%;
+
+    background-image:url("assets/backgrounds/bg1.png");
+
+    background-size:100vw auto;
+
+    background-position:center top;
+
+    background-repeat:repeat-y;
+
+}
+ 
+
+  .header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    z-index: 1000;
+  }
+
+
+  .title {
+    top: 20vh;
+    width: min(70vw, 320px);
+  }
+
+
+
+
+  /* ===== TITLE INSIDE CARD ===== */
+  h2 {
+    text-align: center;
+    color: #304d2f;
+    font-size: 1.4rem;
+  }
+
+  /* ===== DOTS ===== */
+  .dots {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #bbb;
+  }
+
+  .dot.active {
+    background: #222;
+  }
+
+  /* ===== MENU ===== */
+  .menuBtn {
+    position: fixed;
+    top: 50px;
+    right: 15px;
+    width: 55px;
+    height: 55px;
+    background: none;
+    border: none;
+    z-index: 1000;
+  }
+
+  
+  #sideMenu.active {
+    right: 0;
+  }
+
+
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s;
+    z-index: 1000;
+  }
+
+  #overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+#sideMenu a{
+
+    text-decoration:none;
+
+    color:#5d6940;
+
+    font-size:1.8rem;
+
+    font-weight: 580;
+
+    padding:2vh 2vw;
+
+    border-bottom:1px solid rgba(0,0,0,.08);
+
+    transition:.25s;
+}
+
+  #sideMenu a:hover {
+
+    background: #dce7d0;
+  }
+
+  :root {
+
+    --menuColor: #EFFEFF;
+    --menuOpenColor: #88b84d;
+
+    --menuWidth: 55vw;
+
+  }
+
+  #sideMenu {
+
+    position: fixed;
+
+    top: 0;
+    right: -100%;
+
+    width: var(--menuWidth);
+
+    height: 100vh;
+
+    background: rgba(245, 250, 248, .95);
+
+    backdrop-filter: blur(12px);
+
+    border-radius: 30px 0 0 30px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    padding-top: 12vh;
+
+    transition: .4s ease;
+
+    z-index: 1000;
+  }
+
+  #sideMenu.active {
+
+    right: 0;
+  }
+
+  
+.infoBtn{
+    position:fixed;
+    top:92%;
+    left:15px;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    border:none;
+    background:#516b42;
+    color:white;
+    font-size:1.5rem;
+    z-index:2000;
+}
+
+.infoPopup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:3000;
+}
+
+.infoPopup.show{
+    display:flex;
+}
+
+.infoBox{
+    background:#effeffc5;
+    padding:10px;
+    border-radius:20px;
+    width:60%;
+    max-width:300px;
+    color: #516b42;
+    text-align:center;
+    font-size: 1.2rem;
+    
+}
+
+#closeInfo{
+      background:#effeffc5;
+    padding:2px;
+    border-radius:20px;
+    width:60%;
+    max-width:300px;
+    color: #516b42;
+    border: none;
+    text-align:center;
+     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    font-size: 1.8rem;
+    font-weight: 600;
+    font-family: secular;
+}
+
+
+/* ===== PROGRESS ===== */
+
+#progressContainer{
+
+    position:fixed;
+
+    top:70px;
+
+    right:50%;
+
+    transform:translateX(50%);
+
+    width:85%;
+
+    max-width:400px;
+
+    text-align:center;
+
+    color:#effeff;
+
+    font-size:1.2rem;
+
+    z-index:20;
+
+}
+
+
+
+#progressText{
+
+    margin-bottom:10px;
+
+    font-weight:bold;
+
+}
+
+
+
+#progressBar{
+
+    height:12px;
+
+    width:100%;
+
+    background:#dce7d05d;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+}
+
+
+
+#progressFill{
+
+    height:100%;
+
+    width:0%;
+
+    background:#5d6940;
+
+    border-radius:20px;
+
+    transition:.4s;
+
+}
+
+
+
+
+
+
+
+/* ===== QUESTION ===== */
+#testContainer{
+
+    position:relative;
+
+    margin-top:130px;
+
+    width:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:flex-start;
+
+    padding-bottom:40px;
+
+}
+
+
+
+#questionBox{
+
+    width:85%;
+
+    max-width:450px;
+
+    min-height:320px;
+
+    background:#effeff71;
+
+    border-radius:30px;
+
+    padding:15px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+
+    animation:appear .4s ease;
+
+}
+
+
+
+#questionTitle{
+
+    color:#304d2f;
+
+    text-align:center;
+
+    font-size:1.5rem;
+
+}
+
+
+
+
+
+/* ===== ANSWERS ===== */
+
+
+#answersContainer{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+
+
+.answerBtn{
+
+    width:100%;
+
+    min-height:55px;
+
+    border:none;
+
+    border-radius:20px;
+
+    background:#dce7d0;
+
+    color:#304d2f;
+
+    font-family:secular;
+
+    font-size:1.2rem;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+
+
+.answerBtn:hover{
+
+    transform:scale(1.03);
+
+}
+
+
+
+.answerBtn.selected{
+
+    background:#5d6940;
+
+    color:#EFFEFF;
+
+}
+
+
+
+
+
+/* ===== NEXT BUTTON ===== */
+
+
+#nextBtn{
+
+    margin-top:25px;
+
+    width:30%;
+
+    height:55px;
+
+    border:none;
+
+    border-radius:25px;
+
+    background:#5d6940;
+
+    color:#effeff;
+
+    font-family:secular;
+
+    font-size:1.5rem;
+
+    box-shadow:0 8px 15px rgba(0,0,0,.2);
+
+}
+
+
+
+#nextBtn:active{
+
+    transform:scale(.95);
+
+}
+
+
+
+
+
+
+
+/* ===== POPUP ===== */
+
+
+.popup{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.55);
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:5000;
+
+}
+
+
+
+.popup.show{
+
+    display:flex;
+
+}
+
+
+
+.popupBox{
+
+    position:relative;
+
+    width:85%;
+    font-size: 1.5rem;
+    max-width:350px;
+/* height: 80vh; */
+    background:#effeffe4;
+
+    border-radius:30px;
+
+    padding:30px;
+
+    text-align:center;
+
+    color:#516b42;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
+
+    animation:popupIn .3s ease;
+
+}
+
+
+
+#closeResult{
+
+    position:absolute;
+
+    top:10px;
+
+    left:15px;
+
+    border:none;
+
+    background:none;
+
+    font-size:2rem;
+
+    color:#516b42;
+
+}
+
+
+
+#retryBtn,
+#finishBtn{
+
+    width:90%;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:20px;
+
+    margin-top:15px;
+
+    font-family:secular;
+
+    font-size:1.5rem;
+
+}
+
+
+
+#retryBtn{
+
+    background:#516b42;
+
+    color:#EFFEFF;
+
+}
+
+
+
+#finishBtn{
+
+    background:#dce7d0;
+
+    color:#516b42;
+
+}
+
+
+
+
+
+
+
+/* ===== DRAG BOXES ===== */
+
+
+.dragQuestion{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+
+}
+
+
+
+.warehouse,
+.sentenceWarehouse{
+
+    background:#dce7d0;
+
+    border-radius:20px;
+
+    padding:15px;
+
+}
+
+
+
+#dragItems,
+#sentenceItems{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+    gap:10px;
+
+}
+
+
+
+.dragItem{
+
+    background:#5d6940;
+
+    color:white;
+
+    padding:10px 15px;
+
+    border-radius:15px;
+
+    cursor:grab;
+
+}
+
+
+
+.dropAreas{
+
+    display:flex;
+
+    gap:15px;
+
+    justify-content:center;
+
+}
+
+
+
+.dropBox{
+
+    width:120px;
+
+    height:120px;
+
+    border:3px dashed #5d6940;
+
+    border-radius:25px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    color:#516b42;
+
+}
+
+
+
+
+
+/* ===== SENTENCE DRAG ===== */
+
+
+.sentence{
+    width: 85vw;
+    background:#dce7d000;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    font-size:1.5rem;
+
+    min-height:80px;
+
+}
+
+
+
+.dropPlace{
+
+    display:inline-block;
+
+    min-width:80px;
+
+    height:35px;
+
+    border-bottom:3px solid #516b42;
+
+}
+
+
+
+
+
+
+
+
+@keyframes appear{
+
+
+from{
+
+opacity:0;
+
+transform:translateY(30px);
+
+}
+
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+
+}
+
+
+
+@keyframes popupIn{
+
+
+from{
+
+transform:scale(.8);
+
+opacity:0;
+
+}
+
+
+to{
+
+transform:scale(1);
+
+opacity:1;
+
+}
+
+
+}
+
+
+
+
+
+
+
+@media(max-width:600px){
+
+
+.title{
+
+    width:60vw;
+
+}
+
+
+
+#questionBox{
+
+    width:90%;
+
+}
+
+
+
+.answerBtn{
+
+    font-size:1rem;
+
+}
+
+
+
+.dropBox{
+
+    width:100px;
+
+    height:100px;
+
+}
+
+.warehouse{
+
+background:#dce7d000;
+
+padding:15px;
+
+border-radius:20px;
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:10px;
+
+justify-content:center;
+
+}
+
+
+
+.dragItem{
+
+background:#5d6940;
+
+color:#EFFEFF;
+
+padding:10px 15px;
+
+border-radius:15px;
+
+cursor:grab;
+
+font-size:1.1rem;
+
+}
+
+
+
+.dropAreas{
+
+display:flex;
+
+gap:20px;
+
+justify-content:center;
+
+margin-top:20px;
+
+}
+
+
+
+.dropBox{
+
+width:140px;
+
+height:140px;
+
+border:3px  #5d6940;
+
+border-radius:25px;
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+justify-content:center;
+
+background:#effeffaa;
+
+}
+
+
+
+.placedItem{
+
+background:#5d6940;
+
+color:white;
+
+padding:6px 10px;
+
+border-radius:12px;
+
+margin:5px;
+
+}
+.dragItem{
+    touch-action:none;
+    user-select:none;
+}
+
+
+.dragging{
+    opacity:.7;
+    transform:scale(1.1);
+}
+}
+.dragItem,
+.placedItem{
+
+    touch-action:none;
+
+    user-select:none;
+
+    -webkit-user-select:none;
+
+    cursor:grab;
+
+}
+
+
+
+.dragging{
+
+    opacity:.25;
+
+}
+
+
+
+.dragGhost{
+
+    position:fixed;
+
+    z-index:99999;
+
+    pointer-events:none;
+
+    transform:scale(1.15);
+
+    opacity:.95;
+
+    box-shadow:
+    0 15px 30px rgba(0,0,0,.25);
+
+}
+
+
+
+.dropBox{
+
+    min-height:100px;
+
+}
+
+
+
+.placedItem{
+
+    animation:
+    popIn .2s ease;
+
+}
+
+
+
+@keyframes popIn{
+
+    from{
+
+        transform:scale(.7);
+
+        opacity:0;
+
+    }
+
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+}
+</style>
+
+</html>

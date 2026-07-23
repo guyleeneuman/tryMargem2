@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תוצאות מבחנים</title>
+  <link rel="stylesheet" href="index.css">
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+        color: #304d2f;
+    }
+    .cards-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    .result-card {
+        background: #effeff;
+        border: 2px solid #5d6940;
+        border-radius: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        padding: 20px;
+        width: 280px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        color: #304d2f;
+    }
+    .result-card h3 {
+        margin: 0 0 10px 0;
+        color: #516b42;
+        text-align: center;
+    }
+    .delete-btn {
+        background-color: #d9534f;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+        transition: 0.2s;
+    }
+    .delete-btn:hover {
+        background-color: #c9302c;
+    }
+    .back-btn {
+        display: block;
+        width: max-content;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background: #5d6940;
+        color: white;
+        text-decoration: none;
+        border-radius: 15px;
+        font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+    <h1>תוצאות מבחנים שמורים</h1>
+    <a href="index.html" class="back-btn">חזרה לדף הבית</a>
+
+    <div id="cardsContainer" class="cards-container">
+        <p style="text-align: center; width: 100%;">טוען תוצאות מ-Firebase...</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB8S57Iqfi0p_1JgPlz2NT3upakyo-JYUc",
+            authDomain: "margemhot.firebaseapp.com",
+            databaseURL: "https://margemhot-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "margemhot",
+            storageBucket: "margemhot.firebasestorage.app",
+            messagingSenderId: "798968080375",
+            appId: "1:798968080375:web:7e325f48fc16854bdb70f2",
+            measurementId: "G-MXV3ZWYQ2H"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const container = document.getElementById("cardsContainer");
+
+        async function loadResults() {
+            container.innerHTML = "";
+            try {
+                const querySnapshot = await getDocs(collection(db, "testsResults"));
+                if (querySnapshot.empty) {
+                    container.innerHTML = "<p style='text-align: center; width: 100%;'>אין תוצאות שמורות כרגע.</p>";
+                    return;
+                }
+
+                querySnapshot.forEach((documentSnapshot) => {
+                    const data = documentSnapshot.data();
+                    const docId = documentSnapshot.id;
+
+                    const card = document.createElement("div");
+                    card.className = "result-card";
+                    card.innerHTML = `
+                        <h3>${data.testName || "מבחן"}</h3>
+                        <p><strong>שם מלא:</strong> ${data.fullName}</p>
+                        <p><strong>מספר גדוד:</strong> ${data.battalion}</p>
+                        <p><strong>תאריך:</strong> ${data.date}</p>
+                        <p><strong>ציון:</strong> ${data.score}</p>
+                        <button class="delete-btn" data-id="${docId}">מחק מבחן</button>
+                    `;
+
+                    card.querySelector(".delete-btn").onclick = async (e) => {
+                        const idToDelete = e.target.getAttribute("data-id");
+                        if (confirm("האם למחוק את תוצאת המבחן הזו?")) {
+                            try {
+                                await deleteDoc(doc(db, "testsResults", idToDelete));
+                                card.remove();
+                                if(container.children.length === 0) {
+                                    container.innerHTML = "<p style='text-align: center; width: 100%;'>אין תוצאות שמורות כרגע.</p>";
+                                }
+                            } catch (error) {
+                                console.error("שגיאה במחיקה: ", error);
+                                alert("שגיאה במחיקת הנתון מ-Firebase.");
+                            }
+                        }
+                    };
+
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error("שגיאה בטעינת הנתונים: ", error);
+                container.innerHTML = "<p style='text-align: center; width: 100%;'>שגיאה בטעינת הנתונים.</p>";
+            }
+        }
+
+        loadResults();
+    </script>
+</body>
+</html>
