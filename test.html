@@ -321,7 +321,9 @@ const firebaseConfig = {
 // Initialize Firebase (הסרת ה-analytics שגרם לקריסה)
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
+console.log("Firebase התחבר בהצלחה");
+console.log(app);
+console.log(db);
 // השמה בחלון הגלובלי במידת הצורך
 window.db = db;
 window.collection = collection;
@@ -3490,71 +3492,71 @@ loadQuestion();
 // ===============================
 // סיום
 // ===============================
-async function finishTest(){
+// async function finishTest(){
 
 
-progressFill.style.width="100%";
+// progressFill.style.width="100%";
 
 
-document
-.getElementById("resultPopup")
-.classList.add("show");
-
-
-
-document.getElementById("resultName").innerHTML=userName;
-
-document.getElementById("resultBattalion").innerHTML=battalion;
-
-document.getElementById("resultTest").innerHTML=currentTest.title;
-
-document.getElementById("resultScore").innerHTML=
-score+" / 100";
+// document
+// .getElementById("resultPopup")
+// .classList.add("show");
 
 
 
-// שמירה ב-Firebase
+// document.getElementById("resultName").innerHTML=userName;
 
-try {
+// document.getElementById("resultBattalion").innerHTML=battalion;
 
+// document.getElementById("resultTest").innerHTML=currentTest.title;
 
-await addDoc(
-collection(db,"testsResults"),
-{
-
-fullName: userName,
-
-battalion: battalion,
-
-testName: currentTest.title,
-
-score: score,
-
-date: new Date().toLocaleString("he-IL")
-
-}
-
-);
+// document.getElementById("resultScore").innerHTML=
+// score+" / 100";
 
 
-console.log("נשמר בהצלחה");
+
+// // שמירה ב-Firebase
+
+// try {
 
 
-}
+// await addDoc(
+// collection(db,"testsResults"),
+// {
 
-catch(error){
+// fullName: userName,
+
+// battalion: battalion,
+
+// testName: currentTest.title,
+
+// score: score,
+
+// date: new Date().toLocaleString("he-IL")
+
+// }
+
+// );
 
 
-console.error(
-"שגיאה בשמירה:",
-error
-);
+// console.log("נשמר בהצלחה");
 
 
-}
+// }
+
+// catch(error){
 
 
-}
+// console.error(
+// "שגיאה בשמירה:",
+// error
+// );
+
+
+// }
+
+
+// }
 
 
 document.getElementById("retryBtn").onclick=()=>{
@@ -3620,7 +3622,7 @@ window.location.href="page2.html";
 
 // התחלה
 
-loadQuestion();
+// loadQuestion();
 
 async function finishTest() {
         progressFill.style.width = "100%";
