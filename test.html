@@ -3645,7 +3645,22 @@ async function finishTest() {
 
 
     try {
+console.log("מנסה לשמור...");
+console.log(db);
+console.log(userName);
+console.log(currentTest.title);
+const docRef = await addDoc(
+    collection(db,"testsResults"),
+    {
+        fullName:userName,
+        battalion:battalion,
+        testName:currentTest.title,
+        score:score,
+        date:new Date().toLocaleString("he-IL")
+    }
+);
 
+console.log("נוצר מסמך:", docRef.id);
         await addDoc(
             collection(db,"testsResults"),
             {
