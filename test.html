@@ -300,31 +300,28 @@
 
 
     </template>
-   <script type="module">
+  <script type="module">
 
-import {
-db,
-collection,
-addDoc
-}
-from "firebase.js";
+import { db } from "./firebase.js";
+import { collection, addDoc } from 
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
-window.db=db;
-window.collection=collection;
-window.addDoc=addDoc;
+window.firebaseDB = db;
+window.firebaseCollection = collection;
+window.firebaseAddDoc = addDoc;
 
 
-console.log("Firebase מוכן");
+console.log("Firebase התחבר בהצלחה");
 
 </script>
 
 </body>
 
 <script>
-const db = window.db;
-const collection = window.collection;
-const addDoc = window.addDoc;
+const db = window.firebaseDB;
+const collection = window.firebaseCollection;
+const addDoc = window.firebaseAddDoc;
 // ===============================
 // תפריט
 // ===============================
@@ -332,7 +329,6 @@ const addDoc = window.addDoc;
 const menuBtn = document.getElementById("menuBtn");
 const sideMenu = document.getElementById("sideMenu");
 const overlay = document.getElementById("overlay");
-
 
 menuBtn.onclick = ()=>{
 
