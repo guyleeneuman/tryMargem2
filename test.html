@@ -321,9 +321,20 @@ console.log("Firebase התחבר בהצלחה");
 </body>
 
  <script> 
-const database = window.firebaseDB;
-const ref = window.firebaseRef;
-const push = window.firebasePush;
+let database;
+let firebaseRef;
+let firebasePush;
+
+
+setTimeout(()=>{
+
+    database = window.firebaseDB;
+    firebaseRef = window.firebaseRef;
+    firebasePush = window.firebasePush;
+
+    console.log("Firebase variables loaded", database);
+
+},500);
 // ===============================
 // תפריט
 // ===============================
@@ -3646,11 +3657,11 @@ async function finishTest() {
 
     try {
 console.log("מנסה לשמור...");
-console.log(db);
+console.log(database);
 console.log(userName);
 console.log(currentTest.title);
-await push(
-    ref(database,"testsResults"),
+await firebasePush(
+    firebaseRef(database,"testsResults"),
     {
         fullName:userName,
         battalion:battalion,
