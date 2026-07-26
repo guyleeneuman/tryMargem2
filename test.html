@@ -3623,29 +3623,10 @@ window.location.href="page2.html";
 // התחלה
 
 // loadQuestion();
-
-async function finishTest() {
-        progressFill.style.width = "100%";
-        document.getElementById("resultPopup").classList.add("show");
-        document.getElementById("resultName").innerHTML = userName;
-        document.getElementById("resultBattalion").innerHTML = battalion;
-        document.getElementById("resultTest").innerHTML = currentTest.title;
-        document.getElementById("resultScore").innerHTML = score + " / 100";
-    }
-
-    document.getElementById("retryBtn").onclick = () => {
-        currentQuestion = 0;
-        score = 0;
-        document.getElementById("resultPopup").classList.remove("show");
-        loadQuestion();
-    };
-
-    document.getElementById("finishBtn").onclick = () => {
-        window.location.href = "page2.html";
-    };
 async function finishTest() {
 
     progressFill.style.width = "100%";
+
 
     document
     .getElementById("resultPopup")
@@ -3663,10 +3644,7 @@ async function finishTest() {
 
 
 
-    // שמירה Firebase
-
     try {
-
 
         await addDoc(
             collection(db,"testsResults"),
@@ -3692,7 +3670,6 @@ async function finishTest() {
 
     }
 
-
     catch(error){
 
         console.error(
@@ -3701,7 +3678,6 @@ async function finishTest() {
         );
 
     }
-
 
 }
     loadQuestion();
