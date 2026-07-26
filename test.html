@@ -300,11 +300,9 @@
 
 
     </template>
-  <script type="module">
+<script type="module">
 
-import { db } from "./firebase.js";
-import { collection, addDoc } from 
-"https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { db, collection, addDoc } from "./firebase.js";
 
 
 window.firebaseDB = db;
@@ -318,7 +316,7 @@ console.log("Firebase התחבר בהצלחה");
 
 </body>
 
-<script>
+ <script> 
 const db = window.firebaseDB;
 const collection = window.firebaseCollection;
 const addDoc = window.firebaseAddDoc;
