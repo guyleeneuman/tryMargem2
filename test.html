@@ -325,12 +325,12 @@ console.log("Firebase התחבר בהצלחה");
 console.log(app);
 console.log(db);
 // השמה בחלון הגלובלי במידת הצורך
-// window.db = db;
-// window.collection = collection;
-// window.addDoc = addDoc;
-// window.getDocs = getDocs;
-// window.deleteDoc = deleteDoc;
-// window.doc = doc;
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.getDocs = getDocs;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
 </script>
 
 
@@ -3625,6 +3625,25 @@ window.location.href="page2.html";
 // loadQuestion();
 
 async function finishTest() {
+        progressFill.style.width = "100%";
+        document.getElementById("resultPopup").classList.add("show");
+        document.getElementById("resultName").innerHTML = userName;
+        document.getElementById("resultBattalion").innerHTML = battalion;
+        document.getElementById("resultTest").innerHTML = currentTest.title;
+        document.getElementById("resultScore").innerHTML = score + " / 100";
+    }
+
+    document.getElementById("retryBtn").onclick = () => {
+        currentQuestion = 0;
+        score = 0;
+        document.getElementById("resultPopup").classList.remove("show");
+        loadQuestion();
+    };
+
+    document.getElementById("finishBtn").onclick = () => {
+        window.location.href = "page2.html";
+    };
+async function finishTest() {
 
     progressFill.style.width = "100%";
 
@@ -3668,9 +3687,7 @@ async function finishTest() {
         );
 
 
-        console.log(
-        "המבחן נשמר Firebase בהצלחה"
-        );
+        console.log("המבחן נשמר Firebase בהצלחה");
 
 
     }
@@ -3679,14 +3696,17 @@ async function finishTest() {
     catch(error){
 
         console.error(
-        "שגיאה בשמירת מבחן:",
-        error
+            "שגיאה בשמירת מבחן:",
+            error
         );
 
     }
 
 
 }
+    loadQuestion();
+
+
 </script>
 
 <div class="dots"></div>
