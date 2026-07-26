@@ -424,6 +424,7 @@ allResults = [];
 
 
 snapshot.forEach(item=>{
+    console.log("Firebase document:", item.data());
 
 console.log(item.data());
 allResults.push({
@@ -507,24 +508,21 @@ card.className="resultCard";
 
 
 card.innerHTML=`
-
 <h2>
-${result.fullName || "ללא שם"}
+${result.name || "ללא שם"}
 </h2>
 
 
 <p>
-מספר אישי:
-${result.personalNumber || "-"}
+גדוד:
+${result.battalion || "-"}
 </p>
-
 
 
 <p>
 מבחן:
-${result.testName || "-"}
+${result.test || "-"}
 </p>
-
 
 
 <p>
