@@ -325,19 +325,16 @@ console.log("Firebase התחבר בהצלחה");
 console.log(app);
 console.log(db);
 // השמה בחלון הגלובלי במידת הצורך
-window.db = db;
-window.collection = collection;
-window.addDoc = addDoc;
-window.getDocs = getDocs;
-window.deleteDoc = deleteDoc;
-window.doc = doc;
+
 </script>
 
 
 </body>
 
 <script>
-
+ db = window.db;
+const addDoc = window.addDoc;
+const collection = window.collection;
 
 // ===============================
 // תפריט
@@ -3480,7 +3477,23 @@ else{
 loadQuestion();
 
 }
+console.log("עובר לשאלה הבאה", currentQuestion);
 
+currentQuestion++;
+
+
+if(currentQuestion>=currentTest.questions.length){
+
+    console.log("הגעתי לסיום מבחן");
+    finishTest();
+
+}
+
+else{
+
+    loadQuestion();
+
+}
 
 }
 
