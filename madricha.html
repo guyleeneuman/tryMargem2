@@ -346,25 +346,19 @@
 }
 </style>
 <script type="module">
-console.log("Firebase script התחיל");
+
 import { initializeApp } 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-
-import { 
-getFirestore,
-collection,
-getDocs,
-deleteDoc,
-doc
+import {
+getDatabase,
+ref,
+onValue,
+remove
 }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
-
-// ===============================
-// Firebase Config
-// ===============================
 
 const firebaseConfig = {
   apiKey: "AIzaSyB8S57Iqfi0p_1JgPlz2NT3upakyo-JYUc",
@@ -373,27 +367,19 @@ const firebaseConfig = {
   projectId: "margemhot",
   storageBucket: "margemhot.firebasestorage.app",
   messagingSenderId: "798968080375",
-  appId: "1:798968080375:web:7e325f48fc16854bdb70f2",
-  measurementId: "G-MXV3ZWYQ2H"
+  appId: "1:798968080375:web:7e325f48fc16854bdb70f2"
 };
 
 
 
-// אתחול Firebase
-
 const app = initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+
+const database = getDatabase(app);
 
 
 
-
-// ===============================
-// משתנים
-// ===============================
-
-
-let allResults = [];
+let allResults=[];
 
 
 const container =
@@ -401,65 +387,51 @@ document.getElementById("resultsContainer");
 
 
 
-
 // ===============================
 // טעינת מבחנים
 // ===============================
 
-
-async function loadResults(){
-
-
-try{
+function loadResults(){
 
 
-const snapshot = await getDocs(
-    collection(db,"testsResults")
-);
-
-
-console.log("מספר מבחנים:", snapshot.size);
-allResults = [];
+const resultsRef =
+ref(database,"testsResults");
 
 
 
-snapshot.forEach(item=>{
-    console.log("Firebase document:", item.data());
+onValue(resultsRef,(snapshot)=>{
 
-console.log(item.data());
+
+allResults=[];
+
+
+snapshot.forEach(child=>{
+
+
 allResults.push({
 
-id:item.id,
+id:child.key,
 
-...item.data()
+...child.val()
+
+});
+
 
 });
 
 
-});
 
+console.log("Firebase:",allResults);
 
 
 displayResults(allResults);
 
 
 
-}
-
-catch(error){
-
-
-console.error(
-"שגיאה בטעינת מבחנים:",
-error
-);
+});
 
 
 }
-
-
-}
-
 
 
 
@@ -475,18 +447,14 @@ function displayResults(data){
 container.innerHTML="";
 
 
+if(data.length===0){
 
-if(data.length === 0){
 
-
-container.innerHTML=`
-
+container.innerHTML=
+`
 <h2 style="text-align:center;color:#516b42">
-
 לא נמצאו מבחנים
-
 </h2>
-
 `;
 
 
@@ -496,20 +464,20 @@ return;
 
 
 
+
 data.forEach(result=>{
 
 
-
-const card = document.createElement("div");
+const card=document.createElement("div");
 
 
 card.className="resultCard";
 
 
-
 card.innerHTML=`
+
 <h2>
-${result.name || "ללא שם"}
+${result.fullName || "ללא שם"}
 </h2>
 
 
@@ -521,7 +489,7 @@ ${result.battalion || "-"}
 
 <p>
 מבחן:
-${result.test || "-"}
+${result.testName || "-"}
 </p>
 
 
@@ -531,18 +499,14 @@ ${result.score || 0}
 </p>
 
 
-
 <p>
 תאריך:
 ${result.date || "-"}
 </p>
 
 
-
 <button class="deleteBtn">
-
 מחיקת מבחן
-
 </button>
 
 
@@ -550,18 +514,14 @@ ${result.date || "-"}
 
 
 
-
-
-// כפתור מחיקה
-
 card.querySelector(".deleteBtn")
-.onclick = ()=>{
+.onclick=()=>{
+
 
 deleteResult(result.id);
 
+
 };
-
-
 
 
 
@@ -576,22 +536,15 @@ container.appendChild(card);
 
 
 
-
-
 // ===============================
-// מחיקת מבחן
+// מחיקה
 // ===============================
 
 
 async function deleteResult(id){
 
 
-let approve =
-confirm("למחוק את המבחן?");
-
-
-
-if(!approve)
+if(!confirm("למחוק את המבחן?"))
 return;
 
 
@@ -599,13 +552,9 @@ return;
 try{
 
 
-await deleteDoc(
-doc(db,"testsResults",id)
+await remove(
+ref(database,"testsResults/"+id)
 );
-
-
-
-loadResults();
 
 
 
@@ -613,18 +562,15 @@ loadResults();
 
 catch(error){
 
-
 console.error(
 "שגיאה במחיקה:",
 error
 );
 
-
 }
 
 
 }
-
 
 
 
@@ -639,12 +585,11 @@ document
 .addEventListener("input",e=>{
 
 
-const value =
-e.target.value.trim();
+let value=e.target.value.trim();
 
 
 
-const filtered =
+let filtered =
 allResults.filter(item=>{
 
 
@@ -655,9 +600,8 @@ return (
 
 ||
 
-(item.personalNumber || "")
+(item.battalion || "")
 .includes(value)
-
 
 );
 
@@ -669,17 +613,12 @@ return (
 displayResults(filtered);
 
 
-
 });
 
 
 
 
-
-// ===============================
 // התחלה
-// ===============================
-
 
 loadResults();
 

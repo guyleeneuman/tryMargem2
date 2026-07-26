@@ -302,12 +302,16 @@
     </template>
 <script type="module">
 
-import { db, collection, addDoc } from "./firebase.js";
+import { database, ref, push } from "./firebase.js";
 
 
-window.firebaseDB = db;
-window.firebaseCollection = collection;
-window.firebaseAddDoc = addDoc;
+window.firebaseDB = database;
+window.firebaseRef = ref;
+window.firebasePush = push;
+
+// window.firebaseDB = db;
+// window.firebaseCollection = collection;
+// window.firebaseAddDoc = addDoc;
 
 
 console.log("Firebase התחבר בהצלחה");
@@ -317,9 +321,9 @@ console.log("Firebase התחבר בהצלחה");
 </body>
 
  <script> 
-const db = window.firebaseDB;
-const collection = window.firebaseCollection;
-const addDoc = window.firebaseAddDoc;
+const database = window.firebaseDB;
+const ref = window.firebaseRef;
+const push = window.firebasePush;
 // ===============================
 // תפריט
 // ===============================
@@ -3446,20 +3450,20 @@ function createSentenceDrag(q){
 function nextQuestion(){
 
 
-currentQuestion++;
+// currentQuestion++;
 
 
-if(currentQuestion>=currentTest.questions.length){
+// if(currentQuestion>=currentTest.questions.length){
 
-finishTest();
+// finishTest();
 
-}
+// }
 
-else{
+// else{
 
-loadQuestion();
+// loadQuestion();
 
-}
+// }
 console.log("עובר לשאלה הבאה", currentQuestion);
 
 currentQuestion++;
@@ -3645,8 +3649,8 @@ console.log("מנסה לשמור...");
 console.log(db);
 console.log(userName);
 console.log(currentTest.title);
-const docRef = await addDoc(
-    collection(db,"testsResults"),
+await push(
+    ref(database,"testsResults"),
     {
         fullName:userName,
         battalion:battalion,
@@ -3656,24 +3660,24 @@ const docRef = await addDoc(
     }
 );
 
-console.log("נוצר מסמך:", docRef.id);
-        await addDoc(
-            collection(db,"testsResults"),
-            {
+// console.log("נוצר מסמך:", docRef.id);
+//         await addDoc(
+//             collection(db,"testsResults"),
+//             {
 
-                fullName: userName,
+//                 fullName: userName,
 
-                battalion: battalion,
+//                 battalion: battalion,
 
-                testName: currentTest.title,
+//                 testName: currentTest.title,
 
-                score: score,
+//                 score: score,
 
-                date: new Date()
-                .toLocaleString("he-IL")
+//                 date: new Date()
+//                 .toLocaleString("he-IL")
 
-            }
-        );
+//             }
+//         );
 
 
         console.log("המבחן נשמר Firebase בהצלחה");
