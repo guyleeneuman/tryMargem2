@@ -325,12 +325,12 @@ console.log("Firebase התחבר בהצלחה");
 console.log(app);
 console.log(db);
 // השמה בחלון הגלובלי במידת הצורך
-window.db = db;
-window.collection = collection;
-window.addDoc = addDoc;
-window.getDocs = getDocs;
-window.deleteDoc = deleteDoc;
-window.doc = doc;
+// window.db = db;
+// window.collection = collection;
+// window.addDoc = addDoc;
+// window.getDocs = getDocs;
+// window.deleteDoc = deleteDoc;
+// window.doc = doc;
 </script>
 
 
@@ -3625,28 +3625,68 @@ window.location.href="page2.html";
 // loadQuestion();
 
 async function finishTest() {
-        progressFill.style.width = "100%";
-        document.getElementById("resultPopup").classList.add("show");
-        document.getElementById("resultName").innerHTML = userName;
-        document.getElementById("resultBattalion").innerHTML = battalion;
-        document.getElementById("resultTest").innerHTML = currentTest.title;
-        document.getElementById("resultScore").innerHTML = score + " / 100";
+
+    progressFill.style.width = "100%";
+
+    document
+    .getElementById("resultPopup")
+    .classList.add("show");
+
+
+    document.getElementById("resultName").innerHTML = userName;
+
+    document.getElementById("resultBattalion").innerHTML = battalion;
+
+    document.getElementById("resultTest").innerHTML = currentTest.title;
+
+    document.getElementById("resultScore").innerHTML =
+    score + " / 100";
+
+
+
+    // שמירה Firebase
+
+    try {
+
+
+        await addDoc(
+            collection(db,"testsResults"),
+            {
+
+                fullName: userName,
+
+                battalion: battalion,
+
+                testName: currentTest.title,
+
+                score: score,
+
+                date: new Date()
+                .toLocaleString("he-IL")
+
+            }
+        );
+
+
+        console.log(
+        "המבחן נשמר Firebase בהצלחה"
+        );
+
+
     }
 
-    document.getElementById("retryBtn").onclick = () => {
-        currentQuestion = 0;
-        score = 0;
-        document.getElementById("resultPopup").classList.remove("show");
-        loadQuestion();
-    };
 
-    document.getElementById("finishBtn").onclick = () => {
-        window.location.href = "page2.html";
-    };
+    catch(error){
 
-    loadQuestion();
+        console.error(
+        "שגיאה בשמירת מבחן:",
+        error
+        );
+
+    }
 
 
+}
 </script>
 
 <div class="dots"></div>
