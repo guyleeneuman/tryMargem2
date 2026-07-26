@@ -300,42 +300,31 @@
 
 
     </template>
-    <script type="module">
-import { initializeApp } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+   <script type="module">
 
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+db,
+collection,
+addDoc
+}
+from "firebase.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB8S57Iqfi0p_1JgPlz2NT3upakyo-JYUc",
-  authDomain: "margemhot.firebaseapp.com",
-  databaseURL: "https://margemhot-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "margemhot",
-  storageBucket: "margemhot.firebasestorage.app",
-  messagingSenderId: "798968080375",
-  appId: "1:798968080375:web:7e325f48fc16854bdb70f2",
-  measurementId: "G-MXV3ZWYQ2H"
-};
 
-// Initialize Firebase (הסרת ה-analytics שגרם לקריסה)
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-console.log("Firebase התחבר בהצלחה");
-console.log(app);
-console.log(db);
-// השמה בחלון הגלובלי במידת הצורך
+window.db=db;
+window.collection=collection;
+window.addDoc=addDoc;
+
+
+console.log("Firebase מוכן");
 
 </script>
-
 
 </body>
 
 <script>
- db = window.db;
-const addDoc = window.addDoc;
+const db = window.db;
 const collection = window.collection;
-
+const addDoc = window.addDoc;
 // ===============================
 // תפריט
 // ===============================
