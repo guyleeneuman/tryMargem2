@@ -49,15 +49,21 @@
     <h1>דוחות מבחנים</h1>
 
 
-    <div class="searchBox">
+   <div class="filters">
 
-        <input 
+    <input
         id="searchInput"
-        placeholder="חיפוש לפי שם חניך / מספר גדוד">
+        placeholder=" חיפוש לפי שם או גדוד">
 
+    <select id="testFilter">
+        <option value=""> כל המבחנים</option>
+    </select>
 
-    </div>
+    <input
+        id="dateFilter"
+        type="date">
 
+</div>
 
     <div id="resultsContainer"></div>
 
@@ -260,7 +266,7 @@
 
  .dashboard{
 
-    margin-top:140px;
+    margin-top:30px;
     padding:20px;
 
 }
@@ -285,10 +291,10 @@
 
 #searchInput{
 
-    width:90%;
+    width:70%;
     max-width:400px;
 
-    padding:15px;
+    padding:10px;
 
     border-radius:25px;
 
@@ -308,9 +314,9 @@
     background:#effeffc9;
 
     border-radius:25px;
-
+margin-top: 20px;
     padding:20px;
-
+    width: 90%;
     margin-bottom:20px;
 
     color:#516b42;
@@ -321,7 +327,6 @@
 
 
 .resultCard h2{
-
     color:#304d2f;
 
 }
@@ -329,8 +334,8 @@
 
 .deleteBtn{
 
-    width:100%;
-
+    width:50%;
+    font-family: "secular";
     border:none;
 
     border-radius:20px;
@@ -339,9 +344,157 @@
 
     background:#a94442;
 
-    color:white;
-
+    color:#EFFEFF;
+z-index: 100000;
     font-size:1.2rem;
+
+}
+
+#resultsContainer{
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+    margin-top:25px;
+
+}
+
+.resultCard{
+
+    width:85%;
+    max-width:360px;
+
+    background:#effeffd8;
+    font-size: 1.3rem;
+    border-radius:22px;
+line-height: 0.5;
+    padding:18px;
+
+    text-align:center;
+
+    box-shadow:0 10px 20px rgba(0,0,0,.18);
+
+}.filters{
+
+    width:95%;
+    max-width:900px;
+
+    margin:30px auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:12px;
+
+}
+
+#searchInput{
+
+    flex:2.3;
+
+    height:40px;
+
+    border:none;
+
+    border-radius:30px;
+
+    padding:0 20px;
+
+    background:#effeffef;
+
+    color:#43603a;
+
+    font-size:1.05rem;
+
+    font-family:"secular";
+
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+
+}
+
+#testFilter{
+
+    flex:1.2;
+
+    height:40px;
+
+    border:none;
+
+    border-radius:30px;
+
+    padding:0 5px;
+
+    background:#effeffef;
+
+    color:#43603a;
+
+    font-size:1rem;
+
+    font-family:"secular";
+
+    cursor:pointer;
+
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+
+}
+
+#dateFilter{
+
+    flex:1;
+
+    height:40px;
+
+    border:none;
+
+    border-radius:30px;
+
+    padding:0 2px ;
+
+    background:#effeffef;
+
+    color:#43603a;
+
+    font-size:1.1rem;
+
+    font-family:"secular";
+
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+
+}
+
+.filters input:focus,
+.filters select:focus{
+
+    outline:none;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 0 0 3px rgba(136,184,77,.25);
+
+}
+
+@media(max-width:700px){
+
+    .filters{
+
+        flex-wrap:wrap;
+
+    }
+
+    #searchInput{
+
+        flex-basis:100%;
+
+    }
+
+    #testFilter,
+    #dateFilter{
+
+        flex:1;
+
+    }
 
 }
 </style>
@@ -363,8 +516,9 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 const firebaseConfig = {
   apiKey: "AIzaSyB8S57Iqfi0p_1JgPlz2NT3upakyo-JYUc",
   authDomain: "margemhot.firebaseapp.com",
-  databaseURL: "https://margemhot-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "margemhot",
+databaseURL:
+"https://margemhot-default-rtdb.europe-west1.firebasedatabase.app",
+ projectId: "margemhot",
   storageBucket: "margemhot.firebasestorage.app",
   messagingSenderId: "798968080375",
   appId: "1:798968080375:web:7e325f48fc16854bdb70f2"
@@ -398,37 +552,62 @@ const resultsRef =
 ref(database,"testsResults");
 
 
-
 onValue(resultsRef,(snapshot)=>{
 
+    allResults=[];
 
-allResults=[];
+    snapshot.forEach(child=>{
+console.log(child.key);
+console.log(child.val());
+        allResults.push({
 
+            id:child.key,
+            ...child.val()
 
-snapshot.forEach(child=>{
+        });
 
+    });
 
-allResults.push({
+    buildTestsList();
 
-id:child.key,
-
-...child.val()
-
-});
-
-
-});
-
-
-
-console.log("Firebase:",allResults);
-
-
-displayResults(allResults);
-
-
+    filterResults();
 
 });
+function buildTestsList(){
+
+    const select =
+    document.getElementById("testFilter");
+
+
+    const tests =
+    [...new Set(
+        allResults
+        .map(x=>x.testName)
+        .filter(Boolean)
+        .map(x=>x.trim())
+    )];
+
+
+    select.innerHTML =
+    `<option value="">
+        כל המבחנים
+    </option>`;
+
+
+    tests.sort().forEach(test=>{
+
+
+        select.innerHTML +=
+        `
+        <option value="${test}">
+            ${test}
+        </option>
+        `;
+
+
+    });
+
+}
 
 
 }
@@ -551,7 +730,7 @@ return;
 
 try{
 
-
+console.log("מוחק:", id);
 await remove(
 ref(database,"testsResults/"+id)
 );
@@ -578,42 +757,97 @@ error
 // ===============================
 // חיפוש
 // ===============================
-
-
 document
 .getElementById("searchInput")
-.addEventListener("input",e=>{
+.addEventListener("input",filterResults);
+
+document
+.getElementById("testFilter")
+.addEventListener("change",filterResults);
+
+document
+.getElementById("dateFilter")
+.addEventListener("change",filterResults);
 
 
-let value=e.target.value.trim();
+function filterResults(){
+
+    const text =
+    document.getElementById("searchInput")
+    .value
+    .trim();
+
+    const test =
+    document.getElementById("testFilter")
+    .value;
+
+    const date =
+    document.getElementById("dateFilter")
+    .value;
+
+    let filtered =
+    allResults.filter(item=>{
+
+        let okText =
+
+            (item.fullName || "")
+            .includes(text)
+
+            ||
+
+            (item.battalion || "")
+            .includes(text);
+let okTest =
+
+test === "" ||
+
+(item.testName || "").trim() === test.trim();
+        let okDate=true;
+
+        if(date){
+
+            okDate=
+            (item.date || "")
+            .includes(date);
+
+        }
+
+        return okText && okTest && okDate;
+
+    });
+
+    displayResults(filtered);
+
+}
+
+// let value=e.target.value.trim();
 
 
 
-let filtered =
-allResults.filter(item=>{
+// let filtered =
+// allResults.filter(item=>{
 
 
-return (
+// return (
 
-(item.fullName || "")
-.includes(value)
+// (item.fullName || "")
+// .includes(value)
 
-||
+// ||
 
-(item.battalion || "")
-.includes(value)
+// (item.battalion || "")
+// .includes(value)
 
-);
-
-
-});
+// );
 
 
+// });
 
-displayResults(filtered);
 
 
-});
+// displayResults(filtered);
+
+
 
 
 
