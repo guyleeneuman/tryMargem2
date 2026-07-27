@@ -1036,7 +1036,7 @@ correct:[0,3,4]
 
     sentence:[
        "המפקד ימצא ",
-        " בזמן פתיחת המערכת"
+        "  בזמן פתיחת המערכת"
        
     ],
 
@@ -1060,9 +1060,9 @@ correct:[0,3,4]
 
     sentence:[
        "בזמן הירי יונחו (מספר)",
-        "שקי הפקל",
-        "הבסיס (מספר)",
-        "שקי פקל מתחת לבסיס"
+        " שקי הפקל",
+        " הבסיס (מספר)",
+        " שקי פקל מתחת לבסיס"
        
     ],
 
@@ -1087,8 +1087,8 @@ correct:[0,3,4]
     question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
 
     sentence:[
-       "בזמן איור בחנית צריכים להתרחק",
-        "מטר מהקנה חוץ ממי שנשאר בעמדה"
+       " בזמן איור בחנית צריכים להתרחק",
+        " מטר מהקנה חוץ ממי שנשאר בעמדה"
        
     ],
 
@@ -1210,8 +1210,8 @@ questions:[
     question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
 
     sentence:[
-       "הפצמר צריך להיות במצב",
-        "בעת טעינתו"
+       " הפצמר צריך להיות במצב",
+        " בעת טעינתו"
        
     ],
 
@@ -1336,8 +1336,8 @@ correct:1
     question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
 
     sentence:[
-       "הזווית שבה איבו וזיק יתמקמו מעל המטרה על מנת ללזור היא",
-        "?"
+       " הזווית שבה איבו וזיק יתמקמו מעל המטרה על מנת ללזור היא",
+         "?"
        
     ],
 
@@ -1459,8 +1459,8 @@ correct:1
 
     sentence:[
         "זוויות ההגבהה של הקנה בעת ירי פצמר אינרטי הם",
-        "-",
-        "."
+        " -",
+        " ."
     ],
 
     answers:[
@@ -1489,7 +1489,7 @@ answers:[
 "כאשר כל הפצצות יצאו מהקנה",
 "כמה שיותר מהר שלא ישארו בשטח",
 "בצורה מרוכזת רק בסוף הירי ובאישור מפקד העמדה והקצין",
-"לא אוספים אצ הפצצות"
+"לא אוספים את הפצצות"
 
 ],
 
@@ -1521,7 +1521,7 @@ correct:1
 
     sentence:[
         "יש לשקשק את נצרת הירי בירי של פצמר אינרטי אחרי",
-        "."
+        " ."
        
     ],
 
@@ -1580,7 +1580,7 @@ correct:1
 
     sentence:[
         "לפני הירי נעביר את הפצצה",
-        "על מנת לראות שהפצמר יעבור בקנה."
+        " על מנת לראות שהפצמר יעבור בקנה."
        
     ],
 
@@ -1614,8 +1614,8 @@ questions:[
     question:"השלם את המשפט בעזרת גרירת המילה ממחסן המילים",
 
     sentence:[
-        "מכוונים בלילה בעזרת",
-        ""
+        " מכוונים בלילה בעזרת",
+        " ."
     ],
 
     answers:[
@@ -1897,7 +1897,7 @@ correct:1
 
     sentence:[
         "נבצע תרגולת התהפכות ב",
-        ""
+        "."
     ],
 
     answers:[
@@ -2454,60 +2454,41 @@ function createDragQuestion(q){
 
 
 
+function startDrag(e){
+
+    e.preventDefault();
+
+    activeDrag=this;
+
+    // שומר מאיפה הגיע
+    activeDrag.oldParent = this.parentElement;
 
 
-    function startDrag(e){
+    ghost=this.cloneNode(true);
+
+    ghost.className="dragGhost";
+
+    document.body.appendChild(ghost);
 
 
-        e.preventDefault();
+    this.classList.add("dragging");
 
 
-        activeDrag=this;
+    moveGhost(e);
 
 
-
-        ghost=this.cloneNode(true);
-
-
-        ghost.className=
-        "dragGhost";
+    document.addEventListener(
+        "pointermove",
+        moveDrag
+    );
 
 
+    document.addEventListener(
+        "pointerup",
+        endDrag
+    );
 
-        document.body.appendChild(
-            ghost
-        );
-
-
-
-        this.classList.add(
-            "dragging"
-        );
-
-
-
-        moveGhost(e);
-
-
-
-        document.addEventListener(
-            "pointermove",
-            moveDrag
-        );
-
-
-
-        document.addEventListener(
-            "pointerup",
-            endDrag
-        );
-
-
-    }
-
-
-
-
+}
 
 
 
@@ -2555,51 +2536,43 @@ function createDragQuestion(q){
 
 
 
+function endDrag(e){
+
+    let target =
+    document.elementFromPoint(
+        e.clientX,
+        e.clientY
+    );
 
 
-    function endDrag(e){
+    let box =
+    target?.closest(".dropBox");
 
 
-
-        let target =
-        document.elementFromPoint(
-            e.clientX,
-            e.clientY
-        );
+    let warehouse =
+    target?.closest(".warehouse");
 
 
+   if(box){
 
-        let box =
-        target?.closest(
-            ".dropBox"
-        );
+    addToBox(
+        box,
+        activeDrag.dataset.value
+    );
 
+    activeDrag.remove();
 
+}
+else{
 
-        if(box){
+    returnToWarehouse();
 
-
-            addToBox(
-                box,
-                activeDrag.dataset.value
-            );
-
-
-            removeItem(
-                activeDrag
-            );
+}
 
 
-        }
+    finishDrag();
 
-
-
-
-
-        finishDrag();
-
-
-    }
+}
 
 
 
@@ -2621,11 +2594,7 @@ function createDragQuestion(q){
             activeDrag.dataset.value
         );
 
-
-        removeItem(
-            activeDrag
-        );
-
+// activeDrag.oldParent.appendChild(activeDrag);
 
         finishDrag();
 
@@ -2640,75 +2609,75 @@ function createDragQuestion(q){
 
 
 
-
-    function addToBox(box,value){
-
+function addToBox(box,value){
 
 
-        let existing =
-        [...box.querySelectorAll(
-            ".placedItem"
-        )]
-        .find(
-            x=>x.dataset.value===value
-        );
+    let existing =
+    [...box.querySelectorAll(".placedItem")]
+    .find(
+        x=>x.dataset.value===value
+    );
 
 
-
-        if(existing)
-            return;
+    if(existing)
+        return;
 
 
 
+    let item=document.createElement("div");
+
+
+    item.className="placedItem";
+
+
+    item.innerHTML=value;
+
+
+    item.dataset.value=value;
 
 
 
-        let item=document.createElement("div");
-
-
-        item.className="placedItem";
-
-
-        item.innerHTML=value;
-
-
-        item.dataset.value=value;
+    item.addEventListener(
+        "pointerdown",
+        startDrag
+    );
 
 
 
-
-
-        item.addEventListener(
-            "pointerdown",
-            startDrag
-        );
+    box.appendChild(item);
 
 
 
-        box.appendChild(item);
-
-
-
-
-        item.animate(
-            [
-                {
-                    transform:"scale(.7)",
-                    opacity:0
-                },
-                {
-                    transform:"scale(1)",
-                    opacity:1
-                }
-            ],
+    item.animate(
+        [
             {
-                duration:200
+                transform:"scale(.7)",
+                opacity:0
+            },
+            {
+                transform:"scale(1)",
+                opacity:1
             }
-        );
+        ],
+        {
+            duration:200
+        }
+    );
 
 
+    // מוחק רק אם הגיע מהמחסן
+    if(
+        activeDrag.classList.contains("dragItem")
+        &&
+        activeDrag.parentElement.classList.contains("warehouse")
+    ){
+
+        activeDrag.remove();
 
     }
+
+
+}
 
 
 
@@ -2729,10 +2698,21 @@ function createDragQuestion(q){
         }
 
 
-    }
+    }function returnToWarehouse(){
+
+    if(!activeDrag)
+        return;
 
 
+    let warehouse =
+    document.querySelector(".warehouse");
 
+
+    activeDrag.className="dragItem";
+
+    warehouse.appendChild(activeDrag);
+
+}
 
 
 

@@ -58,11 +58,13 @@
     <select id="testFilter">
         <option value=""> כל המבחנים</option>
     </select>
-
-    <input
-        id="dateFilter"
-        type="date">
-
+<input 
+    id="dateFilter" 
+    type="text"
+    placeholder="תאריך"
+    onfocus="this.type='date'"
+    onblur="if(!this.value)this.type='text'">
+</div>
 </div>
 
     <div id="resultsContainer"></div>
@@ -115,7 +117,7 @@
   }
 
   body {
-    margin: 0;
+  margin: 0;
     overflow-x: hidden;
     margin: 0;
     min-height: 100vh;
@@ -266,7 +268,7 @@
 
  .dashboard{
 
-    margin-top:30px;
+    margin-top:35px;
     padding:20px;
 
 }
@@ -275,7 +277,7 @@
 .dashboard h1{
 
     text-align:center;
-    color:#304d2f;
+    color:#EFFEFF;
 
 }
 
@@ -495,6 +497,44 @@ line-height: 0.5;
         flex:1;
 
     }
+
+}
+.dateWrapper{
+    flex:1;
+    position:relative;
+}
+
+.dateWrapper label{
+    position:absolute;
+    right:18px;
+    top:-10px;
+    background:#effeffef;
+    padding:0 8px;
+    font-size:0.8rem;
+    color:#43603a;
+    z-index:2;
+}
+
+#dateFilter{
+
+    width:100%;
+    height:40px;
+
+    border:none;
+
+    border-radius:30px;
+
+    padding:0 15px;
+
+    background:#effeffef;
+
+    color:#43603a;
+
+    font-size:1.1rem;
+
+    font-family:"secular";
+
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
 
 }
 </style>
